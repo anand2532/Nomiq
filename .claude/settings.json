@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make -C firmware/components/nomiq_proto/test*)",
+      "Bash(python3 tools/lora_airtime.py*)",
+      "Bash(python3 mechanical/enclosure/enclosure.py*)",
+      "Bash(kicad-cli sch erc*)",
+      "Bash(kicad-cli pcb drc*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ]
+  },
+  "enableAllProjectMcpServers": false
+}

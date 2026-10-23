@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "kicad": {
+      "command": "uvx",
+      "args": ["kicad-mcp-pro", "--transport", "stdio"],
+      "env": {
+        "KICAD_MCP_TRANSPORT": "stdio",
+        "KICAD_MCP_PROJECT_DIR": "./hardware/kicad/nomiq"
+      }
+    },
+    "build123d": {
+      "command": "uv",
+      "args": ["tool", "run", "--python", "3.12", "build123d-mcp@latest"]
+    },
+    "freecad": {
+      "command": "uvx",
+      "args": ["freecad-mcp"]
+    }
+  }
+}
