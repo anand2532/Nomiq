@@ -1,0 +1,26 @@
+{
+  "_comment": "Command templates run once per utterance. {wav} = 16 kHz mono WAV, {lang} = language code. Adjust model paths to your board. Install notes: README.md",
+  "engines": [
+    {
+      "name": "vosk-small-en",
+      "cmd": "python3 engines/vosk_once.py --model models/vosk-model-small-en-in-0.4 {wav}",
+      "timeout": 120
+    },
+    {
+      "name": "whisper.cpp-tiny.en-q5",
+      "cmd": "whisper.cpp/build/bin/whisper-cli -m models/ggml-tiny.en-q5_1.bin -t 4 -nt -np -f {wav}",
+      "timeout": 180
+    },
+    {
+      "name": "whisper.cpp-base.en-q5",
+      "cmd": "whisper.cpp/build/bin/whisper-cli -m models/ggml-base.en-q5_1.bin -t 4 -nt -np -f {wav}",
+      "timeout": 300
+    },
+    {
+      "name": "sherpa-onnx-zipformer-en-20M",
+      "cmd": "sherpa-onnx-offline --tokens=models/zipformer-en-20M/tokens.txt --encoder=models/zipformer-en-20M/encoder.int8.onnx --decoder=models/zipformer-en-20M/decoder.onnx --joiner=models/zipformer-en-20M/joiner.int8.onnx --num-threads=4 {wav}",
+      "output_regex": "\"text\":\\s*\"([^\"]*)\"",
+      "timeout": 120
+    }
+  ]
+}

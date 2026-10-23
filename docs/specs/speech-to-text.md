@@ -34,6 +34,8 @@ Test set: 100 utterances, 3–10 s each, 5 speakers (Indian-English accents + ta
 | Boot to READY | GPIO timestamp | ≤ 6 s target |
 | Languages | per engine | list |
 
+Tooling: `tools/stt-bench/` (harness: corpus WER/CER, RTF, latency, peak RSS, optional energy; 60 prompts) and `tools/stt-coproc/` (the on-device service + UART protocol shared with `firmware/components/stt_link`).
+
 Results table goes here and into `tests/reports/phase3-stt.md`.
 
 | Engine / model | HW | WER quiet | WER noise | RTF | Cold latency 6 s clip | RAM | Energy/utt | Notes |
