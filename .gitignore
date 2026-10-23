@@ -26,3 +26,4 @@ mechanical/exports/*.step
 *.key
 # OS
 .DS_Store
+firmware/**/test/*.a
