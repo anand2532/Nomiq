@@ -69,7 +69,7 @@ def cutters():
     c.append(Pos(P.WIDTH / 2, P.CAM_BTN_Y, P.SIDE_BTN_Z) * Box(t, P.SIDE_BTN_LEN, P.SIDE_BTN_H))
     # bottom end: USB-C + mic
     usb = Box(P.USBC_W, t, P.USBC_H)
-    usb = fillet(usb.edges().filter_by(Axis.Y), radius=P.USBC_H / 2 - 0.01)
+    usb = fillet(usb.edges().filter_by(Axis.Y), radius=P.USBC_H / 2 - 0.3)
     c.append(Pos(0, -P.LENGTH / 2, P.USBC_Z) * usb)
     c.append(Pos(P.MIC_X, -P.LENGTH / 2, P.USBC_Z) * Rot(90, 0, 0) * Cylinder(P.MIC_D / 2, t))
     # top end: SMA bulkhead + power button
@@ -122,7 +122,8 @@ def main() -> None:
     front, back = build()
     for name, part in (("front_shell", front), ("back_shell", back)):
         bb = part.bounding_box()
-        print(f"{name}: valid={part.is_valid()} volume={part.volume / 1000:.1f} cm3 "
+        valid = part.is_valid() if callable(part.is_valid) else part.is_valid
+        print(f"{name}: valid={valid} volume={part.volume / 1000:.1f} cm3 "
               f"bbox={bb.size.X:.1f} x {bb.size.Y:.1f} x {bb.size.Z:.1f} mm")
         export_step(part, os.path.join(a.out, f"{name}.step"))
         export_stl(part, os.path.join(a.out, f"{name}.stl"))

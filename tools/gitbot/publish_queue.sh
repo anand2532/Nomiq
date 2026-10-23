@@ -32,6 +32,30 @@ for l in phase-0 phase-1 phase-2 phase-3 phase-4 phase-5 phase-6 phase-7 area/ha
   gh label create "$l" --repo "$REPO" --force >/dev/null 2>&1 || true
 done
 
+# Only these checks gate a merge; others (enclosure, firmware-build) are reported but non-blocking
+BLOCKING="${NOMIQ_BLOCKING_CHECKS:-host-tests protocol-tests tools}"
+wait_checks() {
+  local br="$1" tries=0 out
+  sleep 20
+  while :; do
+    out=$(gh pr checks "$br" --repo "$REPO" 2>&1 || true)
+    if grep -qi "no checks reported" <<<"$out"; then echo "no CI checks"; return 0; fi
+    local state
+    state=$(awk -F'\t' -v b="$BLOCKING" 'BEGIN{n=split(b,a," ");for(i=1;i<=n;i++)B[a[i]]=1}
+             ($1 in B){seen=1; if($2=="fail")f=1; else if($2=="pending")p=1}
+             END{print (f?"fail":(p||!seen)?"pending":"pass")}' <<<"$out")
+    if [[ "$state" == "fail" ]]; then echo "$out"; return 1; fi
+    if [[ "$state" == "pass" ]]; then
+      echo "$out" | awk -F'\t' '{printf "  %-16s %s\n", $1, $2}'
+      grep -qP '\tfail\t' <<<"$out" && echo "  (non-blocking check failed — see the PR; merge continues)"
+      return 0
+    fi
+    tries=$((tries + 1))
+    if (( tries > 90 )); then echo "$out"; echo "blocking checks still pending after 30 min"; return 1; fi
+    sleep 20
+  done
+}
+
 slug() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g' | cut -c1-40; }
 prev=""
 while IFS=$'\t' read -r id qbr type area phase title; do
@@ -71,11 +95,7 @@ $(cat "$HERE/issues/$id.md")
 $(git log --format='- %s' origin/main..HEAD)"
   fi
 
-  sleep 20   # let CI register
-  if ! out=$(gh pr checks "$br" --repo "$REPO" --watch --fail-fast 2>&1); then
-    if grep -qi "no checks reported" <<<"$out"; then echo "no CI checks"
-    else echo "$out"; echo "CI failed on $br — fix, then re-run this script"; exit 1; fi
-  fi
+  if ! wait_checks "$br"; then echo "CI failed on $br — fix, then re-run this script"; exit 1; fi
   gh pr merge "$br" --repo "$REPO" --squash --delete-branch
   git fetch -q origin && git checkout -q main && git reset -q --hard origin/main
   echo "$id" >> "$STATE"

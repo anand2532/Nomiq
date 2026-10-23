@@ -26,7 +26,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: pip install build123d
-      - run: python3 mechanical/enclosure/enclosure.py --out mechanical/exports
+      - name: build enclosure
+        run: |
+          set -o pipefail
+          python3 mechanical/enclosure/enclosure.py --out mechanical/exports 2>&1 | tee enclosure.log || {
+            tail -n 40 enclosure.log | while IFS= read -r l; do echo "::error title=enclosure::$l"; done; exit 1; }
       - uses: actions/upload-artifact@v4
         with: {name: enclosure, path: mechanical/exports/}
   firmware-build:
@@ -35,5 +39,12 @@ jobs:
     container: espressif/idf:v5.3.2
     steps:
       - uses: actions/checkout@v4
-      - run: . $IDF_PATH/export.sh && cd firmware && idf.py set-target esp32s3 && idf.py build
+      - name: idf.py build
         shell: bash
+        run: |
+          set -o pipefail
+          . $IDF_PATH/export.sh
+          cd firmware
+          (idf.py set-target esp32s3 && idf.py build) 2>&1 | tee build.log || {
+            grep -E "error|Error|ERROR|undefined reference" build.log | head -n 40 | while IFS= read -r l; do echo "::error title=firmware::$l"; done
+            exit 1; }
