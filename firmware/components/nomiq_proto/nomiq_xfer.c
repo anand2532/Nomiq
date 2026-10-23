@@ -81,7 +81,7 @@ int nomiq_tx_begin_text(nomiq_tx_t *tx, uint32_t self, uint32_t peer, uint16_t m
     tx->state = NOMIQ_TX_OFFER;
     tx->self = self; tx->peer = peer; tx->msg_id = msg_id;
     tx->obj_type = NOMIQ_OBJ_TEXT; tx->prio = NOMIQ_PRIO_TEXT;
-    tx->size = len; tx->frag_n = 1; tx->text = txt;
+    tx->size = len; tx->frag_n = 1; tx->text = txt; tx->inline_text = true;
     return NOMIQ_OK;
 }
 
@@ -129,7 +129,7 @@ static uint32_t tx_send_offer(nomiq_tx_t *tx, const nomiq_io_t *io)
 {
     uint8_t retx = tx->retries ? NOMIQ_F_RETX : 0;
     tx->frames_sent++;
-    if (tx->obj_type == NOMIQ_OBJ_TEXT) {
+    if (tx->inline_text) {
         return emit(io, NOMIQ_T_TEXT, (uint8_t)(NOMIQ_PRIO_TEXT | NOMIQ_F_ACK_REQ | retx), tx->self, tx->peer,
                     tx->msg_id, 0, 1, tx->text, (uint8_t)tx->size);
     }
@@ -222,7 +222,7 @@ bool nomiq_tx_on_frame(nomiq_tx_t *tx, const nomiq_hdr_t *h, const uint8_t *pl, 
 
     switch (h->type) {
     case NOMIQ_T_ACK:
-        if (tx->obj_type == NOMIQ_OBJ_TEXT) { tx->state = NOMIQ_TX_DELIVERED; tx->acked_cnt = 1; }
+        if (tx->inline_text) { tx->state = NOMIQ_TX_DELIVERED; tx->acked_cnt = 1; }
         return true;
 
     case NOMIQ_T_ACCEPT:

@@ -88,7 +88,8 @@ typedef struct {
     uint16_t win[NOMIQ_WINDOW]; /* current window (fragment indices) */
     uint8_t  win_cnt, win_pos;
     void    *obj_ctx;       /* passed to io->read */
-    const uint8_t *text;    /* TEXT objects: inline payload */
+    const uint8_t *text;    /* inline TEXT payload (nomiq_tx_begin_text) */
+    bool     inline_text;   /* single TEXT frame + ACK instead of OFFER/DATA */
 } nomiq_tx_t;
 
 int  nomiq_tx_begin(nomiq_tx_t *tx, uint32_t self, uint32_t peer, uint16_t msg_id, uint8_t obj_type,

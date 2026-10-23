@@ -359,6 +359,13 @@ int main(void)
     test_object(30, 12000, 2);
     test_object(40, 40000, 3);
     test_object(0, 1, 4);
+    { /* regression: TEXT-typed object (> 1 frame) must use OFFER/DATA, not inline TEXT */
+        reset_sim(0, 77); fill_src(600, 1); uint8_t sh[8]; sha8_of(src_obj, 600, sh);
+        nomiq_tx_t t; nomiq_tx_t *tx1[1] = { &t };
+        nomiq_tx_begin(&t, DEV_A, DEV_B, 900, NOMIQ_OBJ_TEXT, 600, sh, src_obj);
+        run(tx1, 1, 600000, NULL);
+        CHECK(t.state == NOMIQ_TX_DELIVERED && !memcmp(src_obj, dst_obj, 600));
+    }
     test_object(20, NOMIQ_MAX_PAYLOAD * 3, 5);
     test_receiver_reboot();
     test_sender_reboot_resume();
