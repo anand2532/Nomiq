@@ -29,7 +29,7 @@ preflight() {
 
 current_branch() { git rev-parse --abbrev-ref HEAD; }
 issue_from_branch() { current_branch | sed -nE 's#^[a-z]+/([0-9]+)-.*#\1#p'; }
-slugify() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g' | cut -c1-40; }
+slugify() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g' | cut -c1-40 | sed -E 's/-+$//'; }
 
 require_clean() { [[ -z "$(git status --porcelain)" ]] || die "working tree not clean — commit or stash first"; }
 

@@ -1,5 +1,17 @@
 menu "Nomiq application"
 
+choice NOMIQ_APP_MODE
+    prompt "App mode"
+    default NOMIQ_APP_LINK_TEST
+    help
+        LINK_TEST: phase-1 radio link test on bare dev kits (serial log only).
+        MESSENGER: full device (display, buttons, microSD, audio, camera, STT).
+config NOMIQ_APP_LINK_TEST
+    bool "Phase-1 link test"
+config NOMIQ_APP_MESSENGER
+    bool "Full messenger"
+endchoice
+
 config NOMIQ_PEER_ID
     hex "Peer device ID for link tests (0 = receive only)"
     default 0x0

@@ -432,6 +432,18 @@ int app_pair_confirm(app_t *a, uint32_t peer, const char *name)
 
 bool app_is_paired(app_t *a, uint32_t peer) { return peer_find(a, peer) != NULL; }
 
+int app_peers(app_t *a, uint32_t *ids, char (*names)[16], int max)
+{
+    int n = 0;
+    for (int i = 0; i < APP_MAX_PEERS && n < max; i++) {
+        if (!a->peer[i].d.used) continue;
+        ids[n] = a->peer[i].d.id;
+        if (names) snprintf(names[n], 16, "%s", a->peer[i].d.name[0] ? a->peer[i].d.name : "peer");
+        n++;
+    }
+    return n;
+}
+
 /* ---------------- lifecycle ---------------- */
 
 app_t *app_create(const app_cfg_t *cfg, uint32_t now_ms)
