@@ -128,6 +128,7 @@ int main(void)
     CHECK(D[2].pair_code == 0);
     CHECK(app_pair_confirm(A[0], ID[1], "Bravo") == 0 && app_pair_confirm(A[1], ID[0], "Alpha") == 0);
     CHECK(app_is_paired(A[0], ID[1]) && app_is_paired(A[1], ID[0]) && !app_is_paired(A[2], ID[0]));
+    { uint32_t ids[4]; char nm[4][16]; CHECK(app_peers(A[0], ids, nm, 4) == 1 && ids[0] == ID[1] && !strcmp(nm[0], "Bravo")); }
 
     /* ---- encrypted text ---- */
     uint32_t s1;

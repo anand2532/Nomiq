@@ -79,6 +79,8 @@ void app_poll(app_t *a, uint32_t now_ms);
 int  app_pair_begin(app_t *a, uint32_t now_ms);
 int  app_pair_confirm(app_t *a, uint32_t peer, const char *name);
 bool app_is_paired(app_t *a, uint32_t peer);
+/* Paired contacts (for the UI). Returns count. */
+int  app_peers(app_t *a, uint32_t *ids, char (*names)[16], int max);
 
 #ifdef __cplusplus
 }
