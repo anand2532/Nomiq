@@ -26,6 +26,7 @@ tools:
 	python3 tools/lora_airtime.py --table > /dev/null
 	bash -n tools/gitbot/gitflow.sh tools/gitbot/publish_queue.sh
 	python3 -m json.tool .mcp.json > /dev/null
+	python3 hardware/design/nomiq_hw.py --check
 
 clean:
 	$(MAKE) -C firmware/components/nomiq_proto/test clean
