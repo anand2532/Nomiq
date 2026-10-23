@@ -1,0 +1,7 @@
+dependencies:
+  idf: ">=5.3"
+  # Enable per phase (keep the skeleton building in CI):
+  # espressif/esp32-camera: "^2.0.0"     # Phase 5
+  # lvgl/lvgl: "^9.2.0"                  # Phase 6
+  # espressif/esp_lcd_ili9341: "^2.0.0"  # Phase 6
+  # Codec2 port + SX126x driver selected in Phase 1/4

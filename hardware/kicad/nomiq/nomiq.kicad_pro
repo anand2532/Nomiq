@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "filename": "nomiq.kicad_pro",
+    "version": 1
+  },
+  "text_variables": {
+    "PROJECT": "Nomiq",
+    "REV": "A0",
+    "COMPANY": "anand2532"
+  }
+}

@@ -1,0 +1,14 @@
+name: Bug
+description: Something does not work as specified
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: {label: What happened / expected}
+    validations: {required: true}
+  - type: input
+    id: rev
+    attributes: {label: "HW rev / FW version / enclosure version"}
+  - type: textarea
+    id: repro
+    attributes: {label: Steps to reproduce + logs}

@@ -1,0 +1,27 @@
+name: Engineering task
+description: Work item for one discipline
+labels: []
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [hardware, pcb, firmware, protocol, audio-stt, camera, power, mechanical, test, docs, bom, infra]
+    validations: {required: true}
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Phase
+      options: [phase-0, phase-1, phase-2, phase-3, phase-4, phase-5, phase-6, phase-7]
+    validations: {required: true}
+  - type: textarea
+    id: goal
+    attributes: {label: Goal}
+    validations: {required: true}
+  - type: textarea
+    id: acceptance
+    attributes: {label: Acceptance criteria, value: "- [ ] "}
+    validations: {required: true}
+  - type: input
+    id: reqs
+    attributes: {label: Requirement IDs, placeholder: "REQ-RF-005, REQ-RF-008"}

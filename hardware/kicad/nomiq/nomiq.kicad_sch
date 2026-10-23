@@ -1,0 +1,20 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "ef9e3e78-1cbe-4f68-a08b-198cb7e316a9")
+	(paper "A3")
+	(title_block
+		(title "Nomiq — LoRa voice/text/photo messenger")
+		(rev "A0")
+		(comment 1 "Sheet plan: hardware/README.md")
+		(comment 2 "Pin map: docs/02-hardware-architecture.md")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
