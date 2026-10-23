@@ -16,6 +16,13 @@ STATE="$HERE/published.txt"; touch "$STATE"
 
 command -v gh >/dev/null || { echo "install GitHub CLI: https://cli.github.com"; exit 1; }
 [[ "$(gh api user --jq .login)" == "$LOGIN" ]] || { echo "run: gh auth login   (as $LOGIN)"; exit 1; }
+# Pushing .github/workflows/* needs the 'workflow' scope (gh's default login does not include it)
+if gh api -i user 2>/dev/null | grep -qi '^x-oauth-scopes:' && ! gh api -i user | grep -i '^x-oauth-scopes:' | grep -qw workflow; then
+  echo "Your gh token lacks the 'workflow' scope (needed to push CI files). Run:"
+  echo "    gh auth refresh -h github.com -s workflow"
+  echo "then re-run this script."
+  exit 1
+fi
 gh auth setup-git >/dev/null
 
 cd "$HERE"
@@ -56,7 +63,7 @@ wait_checks() {
   done
 }
 
-slug() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g' | cut -c1-40; }
+slug() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-|-$//g' | cut -c1-40 | sed -E 's/-+$//'; }
 prev=""
 while IFS=$'\t' read -r id qbr type area phase title; do
   [[ -z "$id" || "$id" == \#* ]] && continue
@@ -83,7 +90,10 @@ while IFS=$'\t' read -r id qbr type area phase title; do
 
   git checkout -q -B "$br" "$tip"
   if [[ -n "$prev" ]]; then git rebase -q --onto origin/main "$prev" "$br"; else git rebase -q origin/main "$br"; fi
-  git push -q -u origin "$br" --force-with-lease
+  if ! git push -q -u origin "$br" --force-with-lease; then
+    echo "push of $br failed. If the message mentions 'workflow', run: gh auth refresh -h github.com -s workflow"
+    exit 1
+  fi
 
   if [[ -z "$state" ]]; then
     gh pr create --repo "$REPO" --base main --head "$br" --title "$title" --assignee "$LOGIN" \
