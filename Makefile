@@ -1,6 +1,6 @@
 # Host-side checks (no hardware, no ESP-IDF needed). Used by CI and the engineer agents.
 .PHONY: test test-proto test-storage tools clean
-test: test-proto test-storage test-radio test-stt test-camera test-app test-ui test-audio tools
+test: test-proto test-storage test-radio test-stt test-camera test-app test-ui test-audio test-power tools
 
 test-proto:
 	$(MAKE) -C firmware/components/nomiq_proto/test
@@ -10,6 +10,9 @@ test-storage:
 
 test-radio:
 	$(MAKE) -C firmware/components/radio_sx1262/test
+
+test-power:
+	$(MAKE) -C firmware/components/power/test
 
 test-audio:
 	$(MAKE) -C firmware/components/audio/test
@@ -43,3 +46,4 @@ clean:
 	$(MAKE) -C firmware/components/app_core/test clean
 	$(MAKE) -C firmware/components/ui/test clean
 	$(MAKE) -C firmware/components/audio/test clean
+	$(MAKE) -C firmware/components/power/test clean
