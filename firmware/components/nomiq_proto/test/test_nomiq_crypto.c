@@ -140,8 +140,19 @@ static void test_replay(void)
     CHECK(!nomiq_replay_accept(&z, 0xFFFFFFF0u));
 }
 
+static void test_sha256(void)
+{
+    nomiq_sha256_t c; uint8_t out[32], exp[32];
+    hex("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", exp);   /* "abc", FIPS 180-2 */
+    CHECK(nomiq_sha256_init(&c) == 0);
+    CHECK(nomiq_sha256_update(&c, (const uint8_t *)"a", 1) == 0);
+    CHECK(nomiq_sha256_update(&c, (const uint8_t *)"bc", 2) == 0);
+    CHECK(nomiq_sha256_final(&c, out) == 0 && memcmp(out, exp, 32) == 0);
+}
+
 int main(void)
 {
+    test_sha256();
     test_ccm_rfc3610_vector1();
     test_hkdf_rfc5869_case1();
     test_x25519_rfc7748_and_pairing();
