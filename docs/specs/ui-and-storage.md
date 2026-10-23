@@ -43,10 +43,10 @@ Status bar on every screen: own ID, selected peer, RSSI/SNR bars, battery %, cha
 
 ```
 /sd/nomiq/
-  index.log            append-only record log (msg_rec_t) + periodic compaction
-  out/<peer>/<msg_id>.{txt,c2,jpg}
-  in/<peer>/<msg_id>.{txt,c2,jpg}
-  partial/<peer>_<sha8>.{bin,bmp}   in-progress receives (data + bitmap) — resumable
+  index.log            append-only log of 64-byte CRC-protected records (PUT / STATE)
+  out/<peer>/<seq>.{txt,c2,jpg}
+  in/<peer>/<seq>.{txt,c2,jpg}
+  partial/<name>.bin   resumable receive state, written atomically (tmp + rename)
   pcm/tmp.pcm          raw recording scratch (deleted after encode/STT)
   contacts.json        paired peers: id, name, pubkey fingerprint
 ```
@@ -54,4 +54,6 @@ Status bar on every screen: own ID, selected peer, RSSI/SNR bars, battery %, cha
 Keys are **not** on SD — they live in encrypted NVS.
 
 **Storage-full (REQ-STO-004):** below 5 % free → warn; below 1 % → REJECT incoming bulk objects (reason STORAGE_FULL), still accept text; offer "delete oldest media".
+Implementation: `firmware/components/storage/msg_store.c` (host-tested: `make test-storage`). A torn tail record after power loss is detected by CRC and truncated; the log is compacted when it exceeds 4× the live records. RAM index holds the newest 1024 messages.
+
 **Persistence (REQ-STO-003):** every state change appended to `index.log` with fsync before radio action; on boot, PENDING/SENDING → PENDING and resume.
