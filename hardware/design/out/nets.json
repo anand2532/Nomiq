@@ -1,0 +1,628 @@
+{
+ "AMP_GAIN": [
+  "R41.1",
+  "U6.GAIN_SLOT"
+ ],
+ "AMP_SD_N": [
+  "R43.1",
+  "U4.P14",
+  "U6.SD_MODE"
+ ],
+ "BAT_NTC": [
+  "J2.NTC",
+  "U8.TS"
+ ],
+ "BB_FB": [
+  "R10.2",
+  "R11.1",
+  "U10.FB"
+ ],
+ "BB_L1": [
+  "L1.1",
+  "U10.L1"
+ ],
+ "BB_L2": [
+  "L1.2",
+  "U10.L2"
+ ],
+ "BTN_BACK_N": [
+  "D73.K",
+  "R73.1",
+  "SW6.1",
+  "U4.P03"
+ ],
+ "BTN_CAMERA_N": [
+  "D75.K",
+  "R75.1",
+  "SW8.1",
+  "U4.P05"
+ ],
+ "BTN_DOWN_N": [
+  "D71.K",
+  "R71.1",
+  "SW4.1",
+  "U4.P01"
+ ],
+ "BTN_RECORD_N": [
+  "D74.K",
+  "R74.1",
+  "SW7.1",
+  "U4.P04"
+ ],
+ "BTN_SELECT_N": [
+  "D72.K",
+  "R72.1",
+  "SW5.1",
+  "U4.P02"
+ ],
+ "BTN_UP_N": [
+  "D70.K",
+  "R70.1",
+  "SW3.1",
+  "U4.P00"
+ ],
+ "CAM_CT": [
+  "C50.1",
+  "U15.CT"
+ ],
+ "CAM_D0": [
+  "J6.Y2",
+  "U1.IO11"
+ ],
+ "CAM_D1": [
+  "J6.Y3",
+  "U1.IO9"
+ ],
+ "CAM_D2": [
+  "J6.Y4",
+  "U1.IO8"
+ ],
+ "CAM_D3": [
+  "J6.Y5",
+  "U1.IO10"
+ ],
+ "CAM_D4": [
+  "J6.Y6",
+  "U1.IO12"
+ ],
+ "CAM_D5": [
+  "J6.Y7",
+  "U1.IO18"
+ ],
+ "CAM_D6": [
+  "J6.Y8",
+  "U1.IO17"
+ ],
+ "CAM_D7": [
+  "J6.Y9",
+  "U1.IO16"
+ ],
+ "CAM_HREF": [
+  "J6.HREF",
+  "U1.IO7"
+ ],
+ "CAM_PCLK": [
+  "J6.PCLK",
+  "U1.IO13"
+ ],
+ "CAM_PWDN": [
+  "J6.PWDN",
+  "U4.P12"
+ ],
+ "CAM_PWR_EN": [
+  "R50.1",
+  "U15.ON",
+  "U4.P16"
+ ],
+ "CAM_RESET_N": [
+  "J6.RESETB",
+  "U4.P13"
+ ],
+ "CAM_VSYNC": [
+  "J6.VSYNC",
+  "U1.IO6"
+ ],
+ "CAM_XCLK": [
+  "J6.XCLK",
+  "R51.2"
+ ],
+ "CAM_XCLK_MCU": [
+  "R51.1",
+  "U1.IO15"
+ ],
+ "CHG_ILIM": [
+  "R4.1",
+  "U8.ILIM"
+ ],
+ "CHG_ISET": [
+  "R3.1",
+  "U8.ISET"
+ ],
+ "CHG_ITERM": [
+  "R5.1",
+  "U8.ITERM"
+ ],
+ "CHG_STAT_N": [
+  "R7.1",
+  "U4.P06",
+  "U8.CHG"
+ ],
+ "CHG_TMR": [
+  "R6.1",
+  "U8.TMR"
+ ],
+ "ESP_EN": [
+  "C20.1",
+  "J3.2",
+  "R20.1",
+  "SW1.1",
+  "SW9.1",
+  "TP10.1",
+  "U1.EN"
+ ],
+ "ESP_USB_DN": [
+  "R23.2",
+  "U1.IO19"
+ ],
+ "ESP_USB_DP": [
+  "R22.2",
+  "U1.IO20"
+ ],
+ "FG_ALRT_N": [
+  "R9.1",
+  "U4.P17",
+  "U9.ALRT"
+ ],
+ "GND": [
+  "C1.2",
+  "C10.2",
+  "C11.2",
+  "C2.2",
+  "C20.2",
+  "C21.2",
+  "C22.2",
+  "C23.2",
+  "C3.2",
+  "C30.2",
+  "C31.2",
+  "C32.2",
+  "C33.2",
+  "C34.2",
+  "C35.2",
+  "C4.2",
+  "C40.2",
+  "C41.2",
+  "C42.2",
+  "C5.2",
+  "C50.2",
+  "C51.2",
+  "C52.2",
+  "C53.2",
+  "C6.2",
+  "C60.2",
+  "C61.2",
+  "C62.2",
+  "C7.2",
+  "C8.2",
+  "C9.2",
+  "D1.GND",
+  "D2.A",
+  "D3.A",
+  "D70.A",
+  "D71.A",
+  "D72.A",
+  "D73.A",
+  "D74.A",
+  "D75.A",
+  "FL1.GND",
+  "FL2.GND",
+  "FL3.GND",
+  "J1.GND",
+  "J1.SHIELD",
+  "J2.BAT-",
+  "J3.6",
+  "J4.GND",
+  "J6.AGND",
+  "J6.DGND",
+  "J7.GND",
+  "J8.SHIELD",
+  "J8.VSS",
+  "J9.GND1",
+  "J9.GND2",
+  "Q1.S",
+  "R1.2",
+  "R11.2",
+  "R13.2",
+  "R2.2",
+  "R3.2",
+  "R4.2",
+  "R40.2",
+  "R41.2",
+  "R43.2",
+  "R5.2",
+  "R50.2",
+  "R6.2",
+  "R61.2",
+  "SW1.2",
+  "SW2.2",
+  "SW3.2",
+  "SW4.2",
+  "SW5.2",
+  "SW6.2",
+  "SW7.2",
+  "SW8.2",
+  "SW9.2",
+  "TP7.1",
+  "U1.GND",
+  "U10.GND",
+  "U10.MODE",
+  "U12.GND",
+  "U13.GND",
+  "U14.GND",
+  "U15.GND",
+  "U2.EP",
+  "U2.GND",
+  "U3.GND",
+  "U4.A0",
+  "U4.A1",
+  "U4.A2",
+  "U4.GND",
+  "U5.GND",
+  "U5.LR",
+  "U6.EP",
+  "U6.GND",
+  "U8.CE",
+  "U8.EN1",
+  "U8.EP",
+  "U8.VSS",
+  "U9.CTG",
+  "U9.EP",
+  "U9.GND",
+  "U9.QSTRT",
+  "Y1.GND"
+ ],
+ "I2C_SCL": [
+  "J6.SCL",
+  "R25.1",
+  "TP9.1",
+  "U1.IO5",
+  "U4.SCL",
+  "U9.SCL"
+ ],
+ "I2C_SDA": [
+  "J6.SDA",
+  "R24.1",
+  "TP8.1",
+  "U1.IO4",
+  "U4.SDA",
+  "U9.SDA"
+ ],
+ "I2S_BCLK": [
+  "U1.IO47",
+  "U5.SCK",
+  "U6.BCLK"
+ ],
+ "I2S_DIN": [
+  "R40.1",
+  "U1.IO46",
+  "U5.SD"
+ ],
+ "I2S_DOUT": [
+  "U1.IO3",
+  "U6.DIN"
+ ],
+ "I2S_WS": [
+  "U1.IO48",
+  "U5.WS",
+  "U6.LRCLK"
+ ],
+ "IOX_INT_N": [
+  "J3.5",
+  "R21.1",
+  "SW2.1",
+  "U1.IO0",
+  "U4.INT"
+ ],
+ "J1_CC1": [
+  "J1.CC1",
+  "R1.1"
+ ],
+ "J1_CC2": [
+  "J1.CC2",
+  "R2.1"
+ ],
+ "LCD_BL": [
+  "Q1.G",
+  "R61.1",
+  "U1.IO45"
+ ],
+ "LCD_CS": [
+  "J7.CS",
+  "R62.1",
+  "U1.IO21"
+ ],
+ "LCD_DC": [
+  "J7.DC",
+  "U1.IO14"
+ ],
+ "LCD_LED_K": [
+  "J7.LED_K",
+  "R60.1"
+ ],
+ "LCD_LED_K_SW": [
+  "Q1.D",
+  "R60.2"
+ ],
+ "LCD_RST_N": [
+  "J7.RESET",
+  "U4.P11"
+ ],
+ "LORA_BUSY": [
+  "TP11.1",
+  "U1.IO2",
+  "U2.BUSY"
+ ],
+ "LORA_DIO1": [
+  "TP12.1",
+  "U1.IO1",
+  "U2.DIO1"
+ ],
+ "LORA_NRST": [
+  "U2.NRESET",
+  "U4.P10"
+ ],
+ "LORA_NSS": [
+  "R30.1",
+  "U1.IO42",
+  "U2.NSS"
+ ],
+ "PGOOD_N": [
+  "R8.1",
+  "TP1.1",
+  "U8.PGOOD"
+ ],
+ "PWR_GOOD": [
+  "R12.1",
+  "TP2.1",
+  "U10.PG"
+ ],
+ "RF_ANT": [
+  "FL3.IN",
+  "U3.RFC"
+ ],
+ "RF_ANT_CONN": [
+  "D3.K",
+  "FL3.OUT",
+  "J4.SIG"
+ ],
+ "RF_RX": [
+  "FL2.IN",
+  "U3.RF2"
+ ],
+ "RF_SW_CTRL": [
+  "U2.DIO2",
+  "U3.CTRL"
+ ],
+ "RF_TX": [
+  "FL1.OUT",
+  "U3.RF1"
+ ],
+ "SD_CS": [
+  "J8.CD_DAT3",
+  "R63.1",
+  "U1.IO38"
+ ],
+ "SD_DETECT_N": [
+  "J8.DET",
+  "R64.1",
+  "U4.P07"
+ ],
+ "SPI_MISO": [
+  "J8.DAT0",
+  "R65.1",
+  "U1.IO41",
+  "U2.MISO"
+ ],
+ "SPI_MOSI": [
+  "J7.SDI",
+  "J8.CMD",
+  "U1.IO40",
+  "U2.MOSI"
+ ],
+ "SPI_SCK": [
+  "J7.SCK",
+  "J8.CLK",
+  "U1.IO39",
+  "U2.SCK"
+ ],
+ "SPK_N": [
+  "J5.2",
+  "U6.OUTN"
+ ],
+ "SPK_P": [
+  "J5.1",
+  "U6.OUTP"
+ ],
+ "STT_CT": [
+  "C9.1",
+  "U14.CT"
+ ],
+ "STT_EN": [
+  "R13.1",
+  "U14.ON",
+  "U4.P15"
+ ],
+ "STT_RX": [
+  "J3.4",
+  "J9.UART_TX",
+  "U1.RXD0"
+ ],
+ "STT_TX": [
+  "J3.3",
+  "J9.UART_RX",
+  "U1.TXD0"
+ ],
+ "SX_DCC_SW": [
+  "L2.1",
+  "U2.DCC_SW"
+ ],
+ "SX_RFI_N": [
+  "FL2.OUT_N",
+  "U2.RFI_N"
+ ],
+ "SX_RFI_P": [
+  "FL2.OUT_P",
+  "U2.RFI_P"
+ ],
+ "SX_RFO": [
+  "FL1.IN",
+  "U2.RFO"
+ ],
+ "SX_VREG": [
+  "C30.1",
+  "L2.2",
+  "U2.VREG"
+ ],
+ "SX_VR_PA": [
+  "C31.1",
+  "U2.VR_PA"
+ ],
+ "SX_XTA": [
+  "C34.1",
+  "R31.2",
+  "U2.XTA"
+ ],
+ "TCXO_OUT": [
+  "R31.1",
+  "Y1.OUT"
+ ],
+ "TCXO_VCC": [
+  "C35.1",
+  "U2.DIO3",
+  "Y1.VCC"
+ ],
+ "USB_DN": [
+  "D1.IO2",
+  "J1.DN1",
+  "J1.DN2"
+ ],
+ "USB_DN_MCU": [
+  "D1.IO3",
+  "R23.1"
+ ],
+ "USB_DP": [
+  "D1.IO1",
+  "J1.DP1",
+  "J1.DP2"
+ ],
+ "USB_DP_MCU": [
+  "D1.IO4",
+  "R22.1"
+ ],
+ "V3V3": [
+  "C21.1",
+  "C22.1",
+  "C23.1",
+  "C32.1",
+  "C33.1",
+  "C40.1",
+  "C60.1",
+  "C61.1",
+  "C62.1",
+  "C7.1",
+  "C8.1",
+  "J3.1",
+  "J7.LED_A",
+  "J7.VCC",
+  "J8.VDD",
+  "R10.1",
+  "R12.2",
+  "R20.2",
+  "R21.2",
+  "R24.2",
+  "R25.2",
+  "R30.2",
+  "R62.2",
+  "R63.2",
+  "R64.2",
+  "R65.2",
+  "R7.2",
+  "R70.2",
+  "R71.2",
+  "R72.2",
+  "R73.2",
+  "R74.2",
+  "R75.2",
+  "R8.2",
+  "R9.2",
+  "TP6.1",
+  "U1.3V3",
+  "U10.VOUT",
+  "U15.VIN",
+  "U2.VBAT",
+  "U2.VBAT_IO",
+  "U2.VDD_IN",
+  "U3.VDD",
+  "U4.VCC",
+  "U5.VDD"
+ ],
+ "VBAT": [
+  "C4.1",
+  "C5.1",
+  "J2.BAT+",
+  "TP5.1",
+  "U8.BAT",
+  "U9.CELL",
+  "U9.VDD"
+ ],
+ "VBUS": [
+  "C1.1",
+  "C2.1",
+  "D1.VBUS",
+  "D2.K",
+  "J1.VBUS",
+  "TP3.1",
+  "U8.IN"
+ ],
+ "VCAM_1V2": [
+  "C53.1",
+  "J6.DVDD",
+  "U13.OUT"
+ ],
+ "VCAM_2V8": [
+  "C52.1",
+  "J6.AVDD",
+  "U12.OUT"
+ ],
+ "VCAM_3V3": [
+  "C51.1",
+  "J6.DOVDD",
+  "U12.EN",
+  "U12.IN",
+  "U13.EN",
+  "U13.IN",
+  "U15.QOD",
+  "U15.VOUT"
+ ],
+ "VSTT": [
+  "C11.1",
+  "J9.VSTT1",
+  "J9.VSTT2",
+  "U14.QOD",
+  "U14.VOUT"
+ ],
+ "VSYS": [
+  "C10.1",
+  "C3.1",
+  "C41.1",
+  "C42.1",
+  "C6.1",
+  "TP4.1",
+  "U10.EN",
+  "U10.VIN",
+  "U14.VIN",
+  "U6.VDD",
+  "U8.EN2",
+  "U8.OUT"
+ ]
+}
