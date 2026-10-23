@@ -35,6 +35,8 @@ stateDiagram-v2
   Home --> Settings: radio, codec, photo quality, language, pairing
 ```
 
+Implementation: `firmware/components/ui/ui_model.c` — a pure state machine (events in → view state + actions out) that the LVGL renderer draws. `test_ui_model.c` drives Modes 1–4 end to end (84 checks), incl. max recording length, low-confidence STT → send as voice, photo size/ETA, cancel, wake-on-receive, PTT from a dark screen and pairing.
+
 Status bar on every screen: own ID, selected peer, RSSI/SNR bars, battery %, charging icon, active-transfer mini-progress.
 
 **Long-transfer UX (REQ-UI-004):** before sending voice/photo show "≈ 1 min 15 s at current signal". During: % complete, ETA, retries, "Pause / Cancel / Run in background". Duty-cycle profile waits are shown as "Waiting for radio quota — 3 min".
