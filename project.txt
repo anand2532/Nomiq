@@ -1,0 +1,377 @@
+git repo : https://github.com/anand2532/Nomiq.git
+
+
+
+# PROJECT: STANDALONE LORA VOICE AND PHOTO MESSENGER
+
+## 1. Product Overview
+
+Design a compact, portable, battery-powered wireless communication device using an ESP32, LoRa transceiver, microphone, speaker, camera, and display.
+
+The device must operate independently without requiring a smartphone, computer, internet connection, cellular network, or cloud service.
+
+Two or more identical devices should communicate directly over LoRa.
+
+Users must be able to:
+1. Record and send voice messages.
+2. Convert recorded speech into text and send the transcribed message.
+3. Capture photographs and send them to another device.
+4. Receive and play voice messages.
+5. Receive and read text messages.
+6. Receive and display photographs.
+7. Store received and sent messages locally.
+
+The device must provide a simple interface that allows users to select the communication mode and recipient using physical buttons.
+
+## 2. Core Design Principle
+
+The device must perform all essential operations locally.
+
+- Voice recording: On-device.
+- Voice playback: On-device.
+- Speech-to-text conversion: On-device.
+- Photograph capture: On-device.
+- Image compression: On-device.
+- Message management: On-device.
+- LoRa communication: Direct device-to-device.
+- Message storage: Local storage.
+- User interface: On-device display and physical controls.
+
+No smartphone or external computer may be required for normal operation.
+
+## 3. Hardware Architecture
+
+### 3.1 Main Processor
+
+Preferred architecture:
+- ESP32-S3 with PSRAM for control, communications, audio acquisition, and camera integration.
+- Dedicated offline speech-recognition hardware or a more capable processor if required by the selected transcription model.
+- Local storage for recordings, photographs, and messages.
+
+The processor architecture must be finalized after validating offline speech recognition, memory requirements, camera compatibility, and power consumption.
+
+### 3.2 LoRa Communication
+
+- Transceiver: Semtech SX1262.
+- Interface: SPI.
+- Frequency: Select a legally permitted operating frequency for India.
+- Direct point-to-point communication.
+- Unique device ID and destination addressing.
+- Message acknowledgements and retransmissions.
+- Packet fragmentation and reassembly.
+- Duplicate packet detection.
+- Transfer progress and timeout handling.
+- Support for interrupted-transfer recovery.
+- End-to-end encryption and device authentication.
+
+### 3.3 Audio System
+
+- Digital MEMS microphone with I²S interface.
+- Speaker with a suitable audio amplifier.
+- Physical push-to-record button.
+- Audio recording and playback support.
+- Local audio storage.
+- Audio compression using a codec suitable for low-bandwidth communication.
+- Offline speech-to-text engine.
+- Local text preview and editing before transmission.
+- Playback controls for received voice messages.
+
+### 3.4 Camera System
+
+- Camera module: OV2640 or a compatible module.
+- Capture button.
+- JPEG image compression.
+- Configurable resolution and image quality.
+- Local photograph storage.
+- Image preview on the display.
+- Packetized image transmission.
+- Image reconstruction and validation on the receiving device.
+
+### 3.5 Display and User Input
+
+Use a small TFT display where possible, because photographs and message previews benefit from a larger screen than a basic OLED.
+
+Provide:
+- Display.
+- Navigation buttons or rotary encoder.
+- Select/confirm button.
+- Back button.
+- Dedicated voice-recording button.
+- Dedicated camera button.
+- Power button.
+
+The interface should show:
+- Device ID and recipient.
+- Message inbox.
+- Voice recording status.
+- Transcription preview.
+- Photograph preview.
+- Transmission progress.
+- Received messages.
+- LoRa signal strength.
+- Battery level.
+- Transfer failures and retry status.
+
+### 3.6 Storage
+
+- microSD card or equivalent storage.
+- Store audio recordings, photographs, text messages, and message metadata.
+- Maintain a local message history.
+- Preserve pending messages until successful delivery or cancellation.
+- Handle storage-full conditions gracefully.
+
+### 3.7 Battery and Power
+
+- Rechargeable single-cell Li-ion/LiPo battery.
+- Initial target capacity: 3,000 mAh, subject to power measurements.
+- USB-C charging.
+- Appropriate battery protection.
+- Battery voltage and charge monitoring.
+- Automatic display timeout.
+- Low-power idle mode.
+- Low-battery warning.
+- Power management for the processor, camera, display, and audio system.
+
+## 4. User Interface and Operation
+
+### MODE 1: SEND VOICE MESSAGE
+
+1. Select a recipient.
+2. Press and hold the record button.
+3. Speak into the microphone.
+4. Release the button to finish recording.
+5. Preview or replay the recording.
+6. Select SEND.
+7. The device compresses the recording and transmits it over LoRa.
+8. The recipient receives and stores the recording.
+9. The recipient can play it through the speaker.
+10. Show delivery status when confirmed.
+
+### MODE 2: SPEECH-TO-TEXT MESSAGE
+
+1. Select a recipient.
+2. Select VOICE TO TEXT.
+3. Speak into the microphone.
+4. The device records the speech.
+5. The offline speech-recognition engine converts the speech into text.
+6. Display the recognized text.
+7. Allow the user to accept, edit, or discard it.
+8. Select SEND.
+9. Transmit the text over LoRa.
+10. Display the received message on the recipient's screen.
+
+Speech recognition must work without internet connectivity.
+
+### MODE 3: CAPTURE AND SEND PHOTOGRAPH
+
+1. Select a recipient.
+2. Press the camera button.
+3. Capture the photograph.
+4. Compress the photograph into JPEG format.
+5. Display an image preview.
+6. Allow the user to accept or retake the image.
+7. Select SEND.
+8. Compress further or reduce image resolution if required.
+9. Divide the image into numbered LoRa packets.
+10. Transmit the packets with error checking and recovery.
+11. Reassemble the image on the receiving device.
+12. Display the photograph after successful reconstruction.
+
+### MODE 4: RECEIVE MESSAGES
+
+When another device sends a message:
+
+- Text messages appear in the inbox.
+- Voice messages appear with a playback option.
+- Photographs appear with a preview option.
+- The device stores received content locally.
+- The user can browse previous messages.
+- The device confirms successful reception to the sender.
+
+## 5. Offline Speech Recognition Requirements
+
+Speech-to-text is a critical feature and must be validated early.
+
+Requirements:
+- No cloud speech-recognition service.
+- No smartphone assistance.
+- Local speech recognition.
+- Configurable language support where hardware permits.
+- Microphone noise reduction where practical.
+- Text preview before transmission.
+- Graceful handling of unclear or unrecognized speech.
+
+IMPORTANT:
+An ESP32-S3 may not have sufficient resources for the desired general-purpose offline speech-recognition model.
+
+Before finalizing the PCB, benchmark the actual model for:
+- Flash and RAM requirements.
+- Recognition accuracy.
+- Supported languages.
+- Processing latency.
+- Power consumption.
+- Model loading and storage requirements.
+
+If the ESP32-S3 cannot meet these requirements, use a more capable processor or a dedicated speech-recognition subsystem. The final device must remain standalone.
+
+## 6. LoRa Transfer Strategy
+
+LoRa must support all three message types, but the transfer strategy must account for its limited bandwidth.
+
+### Text
+- Transmit immediately.
+- Prioritize low latency.
+- Require delivery acknowledgement.
+
+### Voice
+- Compress recordings using a suitable low-bitrate codec.
+- Set configurable maximum recording duration.
+- Transmit in numbered packets.
+- Recover missing packets.
+- Show transfer progress.
+- Support resumable transfers where practical.
+
+### Photographs
+- Use configurable JPEG resolution and quality.
+- Enforce a configurable maximum file size.
+- Divide images into numbered packets.
+- Detect missing or corrupted packets.
+- Retry missing packets.
+- Show progress and estimated transfer time.
+- Support transfer cancellation and resumption.
+
+Large recordings and photographs may take several minutes or longer to transfer, depending on the selected LoRa settings and actual link quality.
+
+The interface must communicate this limitation to users.
+
+## 7. Communication Protocol
+
+Every packet should contain the required protocol fields, such as:
+
+- Protocol version.
+- Source device ID.
+- Destination device ID.
+- Message ID.
+- Message type.
+- Packet sequence number.
+- Fragment index and total fragment count where applicable.
+- Payload length.
+- Integrity-check information.
+- Authentication information where required.
+
+Implement:
+- Acknowledgements.
+- Retransmission.
+- Duplicate filtering.
+- Message prioritization.
+- Timeout handling.
+- File integrity validation.
+- Encryption and authentication.
+- Interrupted-transfer recovery.
+
+Text messages should receive priority over photographs and voice recordings.
+
+## 8. PCB Design Requirements
+
+- Custom compact PCB designed using KiCad.
+- Four-layer PCB preferred if necessary for routing and signal integrity.
+- ESP32-S3 and SX1262 integration.
+- Audio and camera interfaces.
+- Display and button interfaces.
+- Local storage interface.
+- USB-C programming and charging.
+- Battery monitoring.
+- RF antenna connector and suitable RF layout.
+- Accessible debugging and manufacturing test points.
+- Appropriate ESD protection.
+- Thermal and power-integrity considerations.
+- Separate sensitive RF layout from noisy switching and digital circuits where practical.
+- Follow the component manufacturers' layout recommendations.
+- Complete ERC and DRC checks before fabrication.
+- Resolve all unintended unconnected nets.
+- Validate the design through prototype testing before production.
+
+## 9. Mechanical Design
+
+Target enclosure dimensions: approximately 130 × 70 × 30 mm, subject to final component selection.
+
+Requirements:
+- Handheld form factor.
+- Integrated camera opening.
+- Microphone opening.
+- Speaker grille.
+- Display window.
+- Physical buttons.
+- USB-C port.
+- Accessible antenna connection or protected antenna mounting.
+- Secure battery mounting.
+- 3D-printed prototype enclosure.
+- Replaceable battery where practical.
+
+The enclosure dimensions are preliminary and must be adjusted to fit the selected processor, offline speech-recognition hardware, display, battery, camera, and antenna.
+
+## 10. Development Plan
+
+PHASE 1: LoRa communication
+- Build two identical prototypes.
+- Implement direct device-to-device text messaging.
+- Validate acknowledgements and retransmissions.
+
+PHASE 2: Audio hardware
+- Integrate microphone and speaker.
+- Implement local recording and playback.
+
+PHASE 3: Offline speech recognition
+- Select and benchmark the speech-recognition model.
+- Validate recognition accuracy and latency.
+- Upgrade the processing architecture if necessary.
+
+PHASE 4: Voice messaging
+- Implement audio compression.
+- Implement packetized transmission and reconstruction.
+
+PHASE 5: Camera
+- Integrate the camera.
+- Implement JPEG capture and preview.
+- Implement packetized image transfer.
+
+PHASE 6: Product integration
+- Integrate the display and physical controls.
+- Implement local message history.
+- Add battery management and power optimization.
+
+PHASE 7: Custom PCB
+- Finalize hardware architecture.
+- Design and fabricate the PCB.
+- Assemble the device.
+- Integrate the enclosure.
+- Perform communication, reliability, and battery-life testing.
+
+## 11. Final Deliverables
+
+1. System architecture.
+2. Component selection and BOM.
+3. Complete schematic.
+4. PCB layout and manufacturing files.
+5. Embedded firmware source code.
+6. Offline speech-recognition integration.
+7. Audio recording and playback implementation.
+8. Camera and image-transfer implementation.
+9. Communication protocol documentation.
+10. 3D enclosure files.
+11. Hardware bring-up instructions.
+12. Test report covering radio performance, transcription accuracy, transfer times, and battery life.
+
+## 12. Non-Negotiable Requirements
+
+- The device must be completely standalone.
+- No smartphone is required.
+- No internet or cloud service is required.
+- Speech-to-text must operate offline.
+- Text, voice recordings, and photographs must be transferable directly between devices over LoRa.
+- Received messages must be accessible through the device's own display and speaker.
+- Messages must be stored locally.
+- The system must handle unreliable radio links and interrupted transfers.
+- Hardware selection must be validated against the memory and processing requirements of offline speech recognition.
+
+END OF REQUIREMENTS
