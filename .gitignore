@@ -1,0 +1,27 @@
+# build
+firmware/build/
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/managed_components/
+firmware/dependencies.lock
+**/test/test_nomiq_proto
+__pycache__/
+*.pyc
+.venv/
+# KiCad
+*.kicad_prl
+*-backups/
+fp-info-cache
+*.lck
+\#auto_saved_files\#
+_autosave-*
+# generated mechanical exports (CI artefacts); keep released versions via tags
+mechanical/exports/*.stl
+mechanical/exports/*.step
+!mechanical/exports/.gitkeep
+# secrets
+.env
+*.pem
+*.key
+# OS
+.DS_Store
