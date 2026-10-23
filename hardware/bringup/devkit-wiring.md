@@ -14,7 +14,7 @@ Select **Nomiq board → Dev kit** in `idf.py menuconfig` (default).
 | BUSY | 2 | |
 | DIO1 | 1 | IRQ |
 | NRST | 14 | dev kit only (`CONFIG_NOMIQ_DEVKIT_LORA_NRST_GPIO`); PCB uses the IO expander |
-| TXEN / RXEN (E22 only) | — | E22 has DIO2-controlled switch internally? If your module exposes TXEN/RXEN, tie RXEN = !TXEN via DIO2 or wire to spare GPIOs and disable `dio2_rf_switch` |
+| TXEN / RXEN (modules that expose them, e.g. E22-900M22S) | — | The RF switch must be driven: link the module's DIO2 to TXEN and drive RXEN as the inverse (inverter or spare GPIO). Modules that switch internally from DIO2 need nothing. **Check your module's datasheet.** |
 | ANT | 868 MHz antenna | **never transmit without an antenna** |
 
 Later phases (same pins as the PCB): I²S mic/amp on 47/48/46/3, I²C on 4/5, camera DVP per board_pins.h, TFT CS/DC on 21/14 (move NRST to the expander-equivalent when the LCD is added).
