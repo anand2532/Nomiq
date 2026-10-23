@@ -43,11 +43,11 @@ static void test_roundtrip(void)
 static void test_limits(void)
 {
     uint8_t buf[NOMIQ_LORA_MAX_FRAME], pl[NOMIQ_MAX_PAYLOAD + 1] = {0};
-    CHECK(NOMIQ_MAX_PAYLOAD == 227);
+    CHECK(NOMIQ_MAX_PAYLOAD == 223);
     nomiq_hdr_t h = { .type = NOMIQ_T_DATA, .len = NOMIQ_MAX_PAYLOAD, .frag_n = 1 };
     int n = nomiq_frame_encode(&h, pl, buf, sizeof buf);
     CHECK(n == NOMIQ_HDR_LEN + NOMIQ_MAX_PAYLOAD);
-    CHECK(n + NOMIQ_MIC_LEN == NOMIQ_LORA_MAX_FRAME);
+    CHECK(n + NOMIQ_SEC_LEN == NOMIQ_LORA_MAX_FRAME);
     h.len = NOMIQ_MAX_PAYLOAD + 1;
     CHECK(nomiq_frame_encode(&h, pl, buf, sizeof buf) == NOMIQ_E_LEN);
 }
@@ -55,13 +55,13 @@ static void test_limits(void)
 static void test_fragmentation(void)
 {
     CHECK(nomiq_frag_count(0) == 1);
-    CHECK(nomiq_frag_count(227) == 1);
-    CHECK(nomiq_frag_count(228) == 2);
-    CHECK(nomiq_frag_count(12000) == 53);
+    CHECK(nomiq_frag_count(223) == 1);
+    CHECK(nomiq_frag_count(224) == 2);
+    CHECK(nomiq_frag_count(12000) == 54);
     uint32_t off; uint16_t len;
-    CHECK(nomiq_frag_span(12000, 52, &off, &len) == NOMIQ_OK);
-    CHECK(off == 52u * 227u && len == 12000 - 52 * 227);
-    CHECK(nomiq_frag_span(12000, 53, &off, &len) == NOMIQ_E_RANGE);
+    CHECK(nomiq_frag_span(12000, 53, &off, &len) == NOMIQ_OK);
+    CHECK(off == 53u * 223u && len == 12000 - 53 * 223);
+    CHECK(nomiq_frag_span(12000, 54, &off, &len) == NOMIQ_E_RANGE);
 }
 
 /* Simulate a lossy transfer: object reassembled with selective retransmission. */

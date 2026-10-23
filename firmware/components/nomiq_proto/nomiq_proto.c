@@ -47,6 +47,7 @@ int nomiq_frame_encode(nomiq_hdr_t *hdr, const uint8_t *payload, uint8_t *buf, s
     if (buf_len < total) return NOMIQ_E_SHORT;
 
     hdr->version = NOMIQ_PROTO_VERSION;
+    hdr->flags &= (uint8_t)~NOMIQ_F_ENCRYPTED;   /* plaintext encoder */
     hdr->crc16 = 0;
     hdr_pack(hdr, buf);
     if (hdr->len) memcpy(&buf[NOMIQ_HDR_LEN], payload, hdr->len);
@@ -75,17 +76,18 @@ int nomiq_frame_decode(const uint8_t *buf, size_t len, nomiq_hdr_t *hdr, const u
     hdr->frag_n  = get16(&buf[16]);
     hdr->crc16   = get16(&buf[18]);
 
-    if (hdr->len > NOMIQ_MAX_PAYLOAD || NOMIQ_HDR_LEN + (size_t)hdr->len != len) return NOMIQ_E_LEN;
+    size_t body = (size_t)hdr->len + ((hdr->flags & NOMIQ_F_ENCRYPTED) ? NOMIQ_SEC_LEN : 0u);
+    if (hdr->len > NOMIQ_MAX_PAYLOAD || NOMIQ_HDR_LEN + body != len) return NOMIQ_E_LEN;
     if (hdr->frag_n == 0 || hdr->frag_ix >= hdr->frag_n) {
         /* SACK uses frag_ix as window base, still must be < frag_n */
         return NOMIQ_E_RANGE;
     }
 
     uint16_t crc = nomiq_crc16(buf, 18, 0xFFFFu);
-    crc = nomiq_crc16(&buf[NOMIQ_HDR_LEN], hdr->len, crc);
+    crc = nomiq_crc16(&buf[NOMIQ_HDR_LEN], body, crc);
     if (crc != hdr->crc16) return NOMIQ_E_CRC;
 
-    if (payload) *payload = hdr->len ? &buf[NOMIQ_HDR_LEN] : NULL;
+    if (payload) *payload = body ? &buf[NOMIQ_HDR_LEN] : NULL;
     return NOMIQ_OK;
 }
 

@@ -7,32 +7,40 @@ Reference implementation: `firmware/components/nomiq_proto/` (host-testable C). 
 Max LoRa PHY payload 255 B. All multi-byte fields **little-endian**.
 
 ```
- 0        1        2        3        4               8               12      14      16      18      20
-+--------+--------+--------+--------+---------------+---------------+-------+-------+-------+-------+----------------+--------+
-| ver    | type   | flags  | len    | src (u32)     | dst (u32)     |msg_id |frag_ix|frag_n | crc16 | payload (len)  | MIC(8) |
-+--------+--------+--------+--------+---------------+---------------+-------+-------+-------+-------+----------------+--------+
+plaintext :  | header (20) | payload (len)                         |
+encrypted :  | header (20) | ctr (4) | ciphertext (len) | MIC (8)  |   flags.b4 = 1
+```
+
+Header:
+
+```
+ 0      1      2      3      4          8          12       14       16       18       20
++------+------+------+------+----------+----------+--------+--------+--------+--------+
+| ver  | type | flags| len  | src u32  | dst u32  | msg_id | frag_ix| frag_n | crc16  |
++------+------+------+------+----------+----------+--------+--------+--------+--------+
 ```
 
 | Field | Size | Description |
 |---|---|---|
 | `ver` | 1 | Protocol version = `1` |
 | `type` | 1 | See §2 |
-| `flags` | 1 | b0-1 priority (0 = text/control … 3 = bulk), b2 ACK requested, b3 retransmission, b4 encrypted, b5-7 reserved |
-| `len` | 1 | Payload length, 0–227 |
-| `src` / `dst` | 4 / 4 | Device IDs (lower 32 bits of eFuse MAC hash). `0xFFFFFFFF` = broadcast (BEACON only) |
-| `msg_id` | 2 | Per-sender message counter (wraps; disambiguated by `src` + key epoch) |
+| `flags` | 1 | b0-1 priority (0 = control … 3 = photo), b2 ACK requested, b3 retransmission, b4 encrypted, b5-7 reserved |
+| `len` | 1 | Plaintext payload length, 0–223 |
+| `src` / `dst` | 4 / 4 | Device IDs. `0xFFFFFFFF` = broadcast (BEACON only) |
+| `msg_id` | 2 | Per-sender message counter |
 | `frag_ix` | 2 | Fragment index (0-based). For SACK = window base |
 | `frag_n` | 2 | Total fragments of the object; 1 for single-frame messages |
-| `crc16` | 2 | CRC-16/CCITT-FALSE over header bytes 0–17 + payload. Detects corruption cheaply before crypto |
-| `MIC` | 8 | AES-128-CCM tag (present when flags.b4 set) |
+| `crc16` | 2 | CRC-16/CCITT-FALSE over header bytes 0–17 **and every byte after the header** (payload, or ctr+ciphertext+MIC). Cheap corruption filter before crypto |
+| `ctr` | 4 | Sender's 32-bit frame counter (encrypted frames) — nonce input and replay protection |
+| `MIC` | 8 | AES-128-CCM tag |
 
-Header = **20 B**, max payload per fragment = 255 − 20 − 8 = **227 B**.
+Header = **20 B**, security trailer = **12 B**, max payload per fragment = 255 − 20 − 12 = **223 B**.
 
 ## 2. Message types
 
 | Code | Name | Direction | Payload |
 |---|---|---|---|
-| 0x01 | TEXT | A→B | UTF-8 text ≤ 227 B (longer text is sent as an object) |
+| 0x01 | TEXT | A→B | UTF-8 text ≤ 223 B (longer text is sent as an object) |
 | 0x02 | OFFER | A→B | `obj_type u8` (text/voice/photo), `size u32`, `sha256[0:8]`, `codec/format u8`, `meta…` |
 | 0x03 | ACCEPT | B→A | resume bitmap (fragments already held), optional data-channel |
 | 0x04 | DATA | A→B | fragment bytes |
@@ -61,11 +69,15 @@ Reference implementation and tests: `nomiq_xfer.[ch]`, `test/test_nomiq_xfer.c` 
 
 ## 4. Security
 
-* **Pairing (TOFU + confirmation):** devices exchange X25519 public keys in PAIR frames; both screens show a 6-digit code derived from the shared secret; users confirm. Keys stored in encrypted NVS.
-* **Per-pair key:** `K = HKDF-SHA256(ECDH, "nomiq v1" ‖ min(id) ‖ max(id))`, AES-128-CCM, 8-byte tag.
-* **Nonce (13 B):** `src(4) ‖ key_epoch(4) ‖ msg_id(2) ‖ frag_ix(2) ‖ type(1)`. `key_epoch` increments on every boot (persisted) so `msg_id` wrap never reuses a nonce.
-* Header is authenticated (AAD), payload encrypted. BEACON is unencrypted but signed-later (v2).
-* Unpaired senders → REJECT (configurable "open mode" for demos).
+Implementation: `nomiq_crypto.[ch]` (+ `crypto_mbedtls.c` on ESP-IDF, `crypto_openssl.c` for host tests). Verified against RFC 3610 (CCM), RFC 5869 (HKDF) and RFC 7748 (X25519) vectors in `test/test_nomiq_crypto.c`.
+
+* **Pairing (TOFU + confirmation):** devices exchange X25519 public keys in PAIR frames; both screens show a 6-digit code `HKDF(shared, "code" ‖ min(id) ‖ max(id)) mod 10⁶`; both users confirm. Keys stored in encrypted NVS.
+* **Link key:** `K = HKDF-SHA256(salt = "nomiq v1", IKM = X25519 shared, info = "key " ‖ min(id) ‖ max(id))[0:16]`.
+* **Cipher:** AES-128-CCM, 8-byte tag, AAD = header bytes 0–17 (so `dst`, `type`, `msg_id`, `frag_*`, `flags`, `len` are authenticated).
+* **Nonce (13 B):** `src(4) ‖ ctr(4) ‖ type(1) ‖ msg_id(2) ‖ frag_ix(2)`. `ctr` is a per-sender frame counter that increments for **every** transmitted frame (including retransmissions), so a nonce is never reused under one key. The counter is persisted in NVS in blocks of 1024: on boot the device skips to the next block boundary.
+* **Replay protection:** receiver keeps a 64-frame sliding window per peer (`nomiq_replay_accept`). The window is RAM-only; after a receiver reboot the first frame re-anchors it (accepted risk, documented).
+* **Ordering on RX:** CRC → MIC/decrypt → replay window → protocol engine. Failures are counted in link statistics, never answered.
+* Unpaired senders → REJECT (configurable "open mode" for demos). BEACON is plaintext.
 
 ## 5. State machines
 

@@ -36,16 +36,16 @@ Consequences for design:
 
 ## 4. Transfer-time table
 
-Generated with `python3 tools/lora_airtime.py --table` (CR4/5, 10 % PER, 227 B payload/fragment, windowed SACK, no duty limit):
+Generated with `python3 tools/lora_airtime.py --table` (CR4/5, 10 % PER, 223 B payload/fragment, encrypted frames, windowed SACK, no duty limit):
 
 | SF/125 kHz | ToA 255 B | Text 140 B | Voice 15 s (2.3 kB) | Voice 30 s (4.5 kB) | Photo 4 kB | Photo 12 kB | Photo 20 kB |
 |---|---|---|---|---|---|---|---|
-| SF7 | 394 ms | 0.4 s | 4.5 s | 9.1 s | 8.1 s | 24 s | 40 s |
-| SF8 | 697 ms | 0.7 s | 7.9 s | 16 s | 14 s | 42 s | 70 s |
-| SF9 | 1250 ms | 1.3 s | 14 s | 28 s | 25 s | 75 s | 125 s |
-| SF10 | 2255 ms | 2.3 s | 26 s | 51 s | 46 s | 135 s | 225 s |
-| SF11 | 5001 ms | 4.9 s | 56 s | 113 s | 101 s | 299 s | 498 s |
-| SF12 | 9019 ms | 8.8 s | 102 s | 203 s | 182 s | 539 s | 897 s |
+| SF7 | 394 ms | 0.5 s | 4.7 s | 9.3 s | 8.3 s | 25 s | 41 s |
+| SF8 | 697 ms | 0.8 s | 8.2 s | 16 s | 14 s | 43 s | 71 s |
+| SF9 | 1250 ms | 1.3 s | 15 s | 29 s | 26 s | 77 s | 127 s |
+| SF10 | 2255 ms | 2.3 s | 26 s | 52 s | 46 s | 138 s | 229 s |
+| SF11 | 5001 ms | 5.1 s | 58 s | 116 s | 102 s | 304 s | 507 s |
+| SF12 | 9019 ms | 9.2 s | 105 s | 208 s | 184 s | 549 s | 913 s |
 
 ## 5. Adaptive data rate (peer-to-peer)
 
