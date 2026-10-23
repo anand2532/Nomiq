@@ -48,34 +48,46 @@ typedef enum { STORE_OK = 0, STORE_WARN_LOW = 1, STORE_REJECT_BULK = 2 } store_p
 /* Free/total bytes provider (statvfs / esp_vfs_fat_info). Injected for tests. */
 typedef int (*msg_store_space_fn)(const char *root, uint64_t *free_b, uint64_t *total_b);
 
-int  msg_store_init(const char *root, msg_store_space_fn space);
-void msg_store_deinit(void);
+/* One store instance (the device has one; host tests run several side by side). */
+typedef struct {
+    char root[96];
+    msg_store_space_fn space;
+    msg_rec_t *recs;        /* MSG_STORE_MAX entries (PSRAM on device) */
+    int n;
+    uint32_t next_seq;
+    uint32_t log_records;
+    void *log;              /* FILE* */
+    bool hold_compact;
+} msg_store_t;
+
+int  msg_store_init(msg_store_t *S, const char *root, msg_store_space_fn space);
+void msg_store_deinit(msg_store_t *S);
 
 /* Adds a record (seq assigned and returned in r->seq). Returns 0 or -errno. */
-int  msg_store_put(msg_rec_t *r);
-int  msg_store_set_state(uint32_t seq, msg_state_t st);
-const msg_rec_t *msg_store_get(uint32_t seq);
+int  msg_store_put(msg_store_t *S, msg_rec_t *r);
+int  msg_store_set_state(msg_store_t *S, uint32_t seq, msg_state_t st);
+const msg_rec_t *msg_store_get(msg_store_t *S, uint32_t seq);
 /* Newest first; skips DELETED. Optional filter: kind 0 = all, peer 0 = all. */
-int  msg_store_list(msg_rec_t *out, int max, int offset, uint8_t kind, uint32_t peer);
+int  msg_store_list(msg_store_t *S, msg_rec_t *out, int max, int offset, uint8_t kind, uint32_t peer);
 /* Outgoing records that still need the radio (PENDING/SENDING/PAUSED), oldest first. */
-int  msg_store_pending(msg_rec_t *out, int max);
-int  msg_store_count(void);
+int  msg_store_pending(msg_store_t *S, msg_rec_t *out, int max);
+int  msg_store_count(msg_store_t *S);
 
 /* Content file path for a record ("<root>/in/0000abcd/42.jpg"). */
-int  msg_store_path(const msg_rec_t *r, char *buf, size_t len);
+int  msg_store_path(msg_store_t *S, const msg_rec_t *r, char *buf, size_t len);
 
 /* Opaque blobs (resume bitmaps etc.) */
-int  msg_store_blob_save(const char *name, const void *data, size_t len);
-int  msg_store_blob_load(const char *name, void *data, size_t len);
-int  msg_store_blob_delete(const char *name);
+int  msg_store_blob_save(msg_store_t *S, const char *name, const void *data, size_t len);
+int  msg_store_blob_load(msg_store_t *S, const char *name, void *data, size_t len);
+int  msg_store_blob_delete(msg_store_t *S, const char *name);
 
 /* Storage-full policy (REQ-STO-004). */
-store_policy_t msg_store_policy(void);
+store_policy_t msg_store_policy(msg_store_t *S);
 /* Delete oldest finished media (voice/photo) until `need_bytes` freed. Returns bytes freed. */
-uint64_t msg_store_prune_media(uint64_t need_bytes);
+uint64_t msg_store_prune_media(msg_store_t *S, uint64_t need_bytes);
 
 /* Rewrite index.log with live records only (also called automatically). */
-int  msg_store_compact(void);
+int  msg_store_compact(msg_store_t *S);
 
 #ifdef __cplusplus
 }

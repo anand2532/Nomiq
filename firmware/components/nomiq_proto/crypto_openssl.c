@@ -82,3 +82,26 @@ int nomiq_x25519_shared(const uint8_t priv[32], const uint8_t peer_pub[32], uint
 }
 
 int nomiq_random(uint8_t *buf, size_t len) { return RAND_bytes(buf, (int)len) == 1 ? 0 : -1; }
+
+/* SHA-256: keep an EVP_MD_CTX* inside the opaque state */
+_Static_assert(sizeof(nomiq_sha256_t) >= sizeof(EVP_MD_CTX *), "opaque too small");
+int nomiq_sha256_init(nomiq_sha256_t *c)
+{
+    EVP_MD_CTX *m = EVP_MD_CTX_new();
+    if (!m || EVP_DigestInit_ex(m, EVP_sha256(), NULL) != 1) { EVP_MD_CTX_free(m); return -1; }
+    memcpy(c->opaque, &m, sizeof m);
+    return 0;
+}
+int nomiq_sha256_update(nomiq_sha256_t *c, const uint8_t *d, size_t n)
+{
+    EVP_MD_CTX *m; memcpy(&m, c->opaque, sizeof m);
+    return EVP_DigestUpdate(m, d, n) == 1 ? 0 : -1;
+}
+int nomiq_sha256_final(nomiq_sha256_t *c, uint8_t out[32])
+{
+    EVP_MD_CTX *m; memcpy(&m, c->opaque, sizeof m);
+    unsigned l = 0;
+    int ok = EVP_DigestFinal_ex(m, out, &l) == 1 && l == 32;
+    EVP_MD_CTX_free(m);
+    return ok ? 0 : -1;
+}

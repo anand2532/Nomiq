@@ -36,6 +36,12 @@ int nomiq_x25519_public(uint8_t priv[32], uint8_t pub[32]);
 int nomiq_x25519_shared(const uint8_t priv[32], const uint8_t peer_pub[32], uint8_t shared[32]);
 int nomiq_random(uint8_t *buf, size_t len);
 
+/* Incremental SHA-256 (object integrity: first 8 bytes go into OFFER). */
+typedef struct { uint64_t opaque[28]; } nomiq_sha256_t;   /* 224 B, 8-byte aligned */
+int nomiq_sha256_init(nomiq_sha256_t *c);
+int nomiq_sha256_update(nomiq_sha256_t *c, const uint8_t *d, size_t n);
+int nomiq_sha256_final(nomiq_sha256_t *c, uint8_t out[32]);
+
 /* ---- protocol helpers ---- */
 void nomiq_nonce(uint32_t src, uint32_t ctr, uint8_t type, uint16_t msg_id, uint16_t frag_ix,
                  uint8_t nonce[13]);

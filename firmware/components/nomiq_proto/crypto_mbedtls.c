@@ -7,6 +7,7 @@
 #include "mbedtls/hkdf.h"
 #include "mbedtls/md.h"
 #include "mbedtls/ecp.h"
+#include "mbedtls/sha256.h"
 
 static int rng(void *p, unsigned char *b, size_t n) { (void)p; esp_fill_random(b, n); return 0; }
 
@@ -73,3 +74,22 @@ int nomiq_x25519_shared(const uint8_t priv[32], const uint8_t peer_pub[32], uint
 }
 
 int nomiq_random(uint8_t *buf, size_t len) { esp_fill_random(buf, len); return 0; }
+
+_Static_assert(sizeof(nomiq_sha256_t) >= sizeof(mbedtls_sha256_context), "opaque too small");
+int nomiq_sha256_init(nomiq_sha256_t *c)
+{
+    mbedtls_sha256_context *m = (mbedtls_sha256_context *)c->opaque;
+    mbedtls_sha256_init(m);
+    return mbedtls_sha256_starts(m, 0) == 0 ? 0 : -1;
+}
+int nomiq_sha256_update(nomiq_sha256_t *c, const uint8_t *d, size_t n)
+{
+    return mbedtls_sha256_update((mbedtls_sha256_context *)c->opaque, d, n) == 0 ? 0 : -1;
+}
+int nomiq_sha256_final(nomiq_sha256_t *c, uint8_t out[32])
+{
+    mbedtls_sha256_context *m = (mbedtls_sha256_context *)c->opaque;
+    int rc = mbedtls_sha256_finish(m, out);
+    mbedtls_sha256_free(m);
+    return rc == 0 ? 0 : -1;
+}
