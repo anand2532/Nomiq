@@ -42,7 +42,7 @@ Delegate to the owning agent; for cross-cutting work start with project-manager.
 
 ## Commands
 - `python3 tools/lora_airtime.py --table` — transfer-time table
-- `make -C firmware/components/nomiq_proto/test` — protocol unit tests
+- `make test` — all host tests (protocol, transfer simulation, crypto vectors, message store, tools)
 - `python3 mechanical/enclosure/enclosure.py --out mechanical/exports` — build enclosure
 - `cd firmware && idf.py set-target esp32s3 build` — firmware build (ESP-IDF ≥ 5.3)
 
