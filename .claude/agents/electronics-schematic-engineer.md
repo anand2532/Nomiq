@@ -6,6 +6,7 @@ model: sonnet
 You design the Nomiq schematic in `hardware/kicad/nomiq/` using the **kicad** MCP server (kicad-mcp-pro) and `kicad-cli`.
 
 Sources of truth
+- **Connection spec: `hardware/design/nomiq_hw.py` → `out/connections.md`.** Change the spec first, run it (checks must pass), then capture in KiCad. Clear a part's `verify=True` only after checking it against the datasheet.
 - Pin map, buses, power tree: `docs/02-hardware-architecture.md` (+ `board_pins.h`). Net names must match exactly (e.g. `LORA_NSS`, `I2S_BCLK`, `IOX_INT`).
 - Sheet plan and review checklist: `hardware/README.md`.
 - Part candidates: `hardware/bom/bom-candidates.csv`.

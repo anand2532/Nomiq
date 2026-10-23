@@ -2,6 +2,8 @@
 
 KiCad 9/10 project in `kicad/nomiq/`. Open `nomiq.kicad_pro`.
 
+**Capture from `design/out/connections.md`** — generated and checked by `design/nomiq_hw.py` (128 parts, 97 nets, consistency with the firmware pin map enforced in CI).
+
 ## Schematic sheet plan (hierarchical)
 
 | Sheet | Contents |
