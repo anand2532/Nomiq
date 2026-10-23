@@ -1,0 +1,1 @@
+Phase-0 baseline: requirements, architecture, specs, ADRs, firmware skeleton with host-tested `nomiq_proto`, parametric enclosure, KiCad project skeleton, `.mcp.json` (kicad-mcp-pro, build123d-mcp, freecad-mcp), 13 Claude Code engineer agents, git bot and CI.

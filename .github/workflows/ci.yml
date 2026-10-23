@@ -1,0 +1,37 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  protocol-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make -C firmware/components/nomiq_proto/test
+  tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: python3 tools/lora_airtime.py --table
+      - run: bash -n tools/gitbot/gitflow.sh
+      - run: python3 -m json.tool .mcp.json > /dev/null
+  enclosure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install build123d
+      - run: python3 mechanical/enclosure/enclosure.py --out mechanical/exports
+      - uses: actions/upload-artifact@v4
+        with: {name: enclosure, path: mechanical/exports/}
+  firmware-build:
+    runs-on: ubuntu-latest
+    container: espressif/idf:v5.3.2
+    steps:
+      - uses: actions/checkout@v4
+      - run: . $IDF_PATH/export.sh && cd firmware && idf.py set-target esp32s3 && idf.py build
+        shell: bash
