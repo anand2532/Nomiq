@@ -1,11 +1,14 @@
-/* Camera: OV2640 capture + JPEG size control. Phase 5. */
+/* Camera: OV2640 capture with automatic JPEG size control (Phase 5). Logic: image_fit.h */
 #pragma once
 #include <stdbool.h>
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "esp_err.h"
-typedef struct { uint16_t width, height; uint8_t quality; uint32_t max_bytes; } camera_shot_cfg_t;
-esp_err_t camera_init(void);
+#include "image_fit.h"
+
 esp_err_t camera_power(bool on);
-/* Captures, then re-encodes / down-scales until size <= max_bytes. Writes JPEG to path. */
-esp_err_t camera_capture(const camera_shot_cfg_t *cfg, const char *path, size_t *out_len);
+/* Capture a photo that fits cfg->max_bytes and write it as JPEG to `path`. */
+esp_err_t camera_capture(const img_fit_cfg_t *cfg, const char *path, img_fit_result_t *out);
+/* Grab an RGB565 preview frame (320x240) for the LCD; release with camera_preview_release(). */
+esp_err_t camera_preview(const uint8_t **rgb565, size_t *len);
+void      camera_preview_release(void);
