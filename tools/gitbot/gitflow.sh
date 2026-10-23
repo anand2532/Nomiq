@@ -97,7 +97,7 @@ $(git log --format='- %s' "origin/$MAIN..HEAD")
 cmd_merge() {
   preflight
   local br; br=$(current_branch)
-  sleep 5  # give CI a moment to register
+  sleep 20  # give CI a moment to register
   local out
   if ! out=$(gh pr checks "$br" --repo "$REPO" --watch --fail-fast 2>&1); then
     if grep -qi "no checks reported" <<<"$out"; then info "no CI checks on this PR"

@@ -48,4 +48,4 @@ Delegate to the owning agent; for cross-cutting work start with project-manager.
 
 ## Git (via git-ops-bot / `tools/gitbot/gitflow.sh`)
 Never push to main directly. Flow: `gitflow.sh start "<title>" <area> <phase>` → `gitflow.sh commit "type(scope): msg"` → `gitflow.sh pr` → CI → `gitflow.sh merge`. `gh` must be logged in as anand2532.
-Branches `<type>/<issue#>-<slug>` (created by the bot); conventional commits (`feat(proto): …`, `fix(pcb): …`); tags `hw-vX.Y`, `fw-vX.Y.Z`, `mech-vX.Y`.
+Branches `<type>/<issue#>-<slug>` (created by the bot). Work prepared offline is delivered as a bundle and published with `tools/gitbot/publish_queue.sh` (same issue → PR → merge flow); conventional commits (`feat(proto): …`, `fix(pcb): …`); tags `hw-vX.Y`, `fw-vX.Y.Z`, `mech-vX.Y`.

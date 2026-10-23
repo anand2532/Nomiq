@@ -56,7 +56,7 @@ Working with Claude Code and the engineering agents: see [docs/ai-workflow.md](d
 
 ## Status
 
-Phase 0 — architecture & de-risking. See [docs/03-development-roadmap.md](docs/03-development-roadmap.md).
+Phase 0 — architecture & de-risking. Original brief: [project.txt](project.txt). See [docs/03-development-roadmap.md](docs/03-development-roadmap.md).
 
 **Gating risks (must close before PCB freeze):**
 1. Offline STT on target hardware (Phase 3 benchmark) — ESP32-S3 alone cannot do free-form dictation.
