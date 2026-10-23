@@ -1,0 +1,33 @@
+menu "Nomiq application"
+
+config NOMIQ_PEER_ID
+    hex "Peer device ID for link tests (0 = receive only)"
+    default 0x0
+    help
+        32-bit ID printed by the other unit at boot ("device id xxxxxxxx").
+
+config NOMIQ_PING_INTERVAL_MS
+    int "Link-test ping interval (ms)"
+    default 10000
+
+config NOMIQ_LORA_FREQ_HZ
+    int "LoRa frequency (Hz) — 865000000..867000000"
+    default 865062500
+
+config NOMIQ_LORA_SF
+    int "Spreading factor (7..12)"
+    range 7 12
+    default 9
+
+config NOMIQ_TX_DBM
+    int "TX power (dBm, conducted)"
+    range -9 22
+    default 14
+
+config NOMIQ_REG_PROFILE_SRD2021
+    bool "Enforce 2.5% duty cycle (G.S.R. 853(E) 2021 SRD profile)"
+    default n
+    help
+        See docs/adr/0003-india-regulatory-profile.md.
+
+endmenu

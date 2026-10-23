@@ -1,0 +1,29 @@
+menu "Nomiq board"
+
+choice NOMIQ_BOARD
+    prompt "Target hardware"
+    default NOMIQ_BOARD_DEVKIT
+    help
+        DEVKIT: ESP32-S3-DevKitC-1 N16R8 + SX1262 module wired per
+        hardware/bringup/devkit-wiring.md (Phases 1-6, no IO expander).
+        PCB_A0: Nomiq custom board rev A0 (TCA9535 expander present).
+
+config NOMIQ_BOARD_DEVKIT
+    bool "Dev kit (ESP32-S3-DevKitC + SX1262 module)"
+config NOMIQ_BOARD_PCB_A0
+    bool "Nomiq PCB rev A0"
+endchoice
+
+config NOMIQ_DEVKIT_LORA_NRST_GPIO
+    int "Dev kit: GPIO wired to SX1262 NRESET"
+    depends on NOMIQ_BOARD_DEVKIT
+    default 14
+
+config NOMIQ_DEVKIT_TCXO
+    bool "Dev kit: SX1262 module uses a DIO3-powered TCXO"
+    depends on NOMIQ_BOARD_DEVKIT
+    default y
+    help
+        Most E22-900M22S / Core1262 modules use a TCXO on DIO3; disable for crystal modules.
+
+endmenu
