@@ -4,7 +4,8 @@ firmware/sdkconfig
 firmware/sdkconfig.old
 firmware/managed_components/
 firmware/dependencies.lock
-**/test/test_nomiq_proto
+firmware/**/test/test_*
+!firmware/**/test/test_*.c
 __pycache__/
 *.pyc
 .venv/

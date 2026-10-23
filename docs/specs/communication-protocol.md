@@ -46,13 +46,18 @@ Header = **20 B**, max payload per fragment = 255 − 20 − 8 = **227 B**.
 
 ## 3. Reliability
 
-* **ACK/retry:** TEXT and control frames retry with exponential backoff + jitter: 1, 2, 4, 8 × (ToA + 200 ms), max 5 tries.
-* **Windowed selective-repeat:** sender transmits up to 16 DATA frames, then waits for SACK. Only missing fragments are resent. Window base advances to the first missing fragment.
+* **ACK/retry:** frames that expect a reply (TEXT, OFFER, last DATA of a window, probes) carry `ACK_REQ`. Timeout = 2ⁿ × (2·ToA + 300 ms) + jitter (n capped at 6), max **8** retries before `FAILED` (the message stays resumable).
+* **Half-duplex listen hold:** after a frame with `ACK_REQ` the sender keeps the radio in RX for ≈ 2·ToA + 100 ms (or until the reply), so replies are never lost to our own transmissions.
+* **Timeout recovery:** first timeout → probe (re-send the first unacknowledged fragment with `ACK_REQ`); further timeouts → re-OFFER. Re-OFFER also recovers a receiver that rebooted: it reloads the persisted partial by `(src, sha8)` and answers ACCEPT with its bitmap.
+* **Windowed selective-repeat:** sender transmits up to 16 DATA frames (inside the 64-fragment SACK span), the last with `ACK_REQ`, then waits for SACK. Only missing fragments are resent. ACCEPT and SACK bitmaps are **authoritative** snapshots of the receiver (a receiver that discarded a corrupt object can un-acknowledge fragments).
 * **Duplicate filter:** receiver keeps an LRU of the last 64 `(src, msg_id, frag_ix, type)` tuples; duplicates are re-ACKed but not re-processed.
 * **Integrity:** per-frame CRC16 + MIC; per-object truncated SHA-256 in OFFER checked after reassembly. Mismatch → discard and request full resend.
 * **Timeouts:** receiver drops an incomplete object after 30 min idle (configurable) but **keeps fragments on SD** so the sender can resume.
 * **Resume:** both sides persist the bitmap on SD. A new OFFER with the same `(src, sha)` gets an ACCEPT carrying the bitmap of fragments already held.
-* **Priority:** TX scheduler services queues strictly: control > text > voice > photo. A bulk transfer yields after the current window if text is queued.
+* **Priority:** the scheduler (`nomiq_sched_pick`) grants the air one frame at a time: control > text > voice > photo. A text queued during a photo goes out after the current fragment (simulated: 0.6 s), not after the window.
+* **Duty cycle:** `nomiq_duty_*` keeps a rolling 1-hour airtime ledger (60 × 1-min buckets) for the `IN865_SRD2021` profile; the radio layer checks `can_send` before every frame.
+
+Reference implementation and tests: `nomiq_xfer.[ch]`, `test/test_nomiq_xfer.c` — discrete-event simulation with loss, half-duplex collisions, receiver/sender reboot, corruption, storage-full and a 60-run Monte-Carlo at 25 % loss.
 
 ## 4. Security
 
