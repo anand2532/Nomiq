@@ -1,13 +1,16 @@
 CC     ?= cc
 CFLAGS ?= -std=c99 -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined
-SRC    := ../nomiq_proto.c test_nomiq_proto.c
+INC    := -I../include
+CORE   := ../nomiq_proto.c ../nomiq_xfer.c
+HDRS   := $(wildcard ../include/*.h)
+TESTS  := test_nomiq_proto test_nomiq_xfer
 
 .PHONY: test clean
-test: test_nomiq_proto
-	./test_nomiq_proto
+test: $(TESTS)
+	@for t in $(TESTS); do echo "== $$t"; ./$$t || exit 1; done
 
-test_nomiq_proto: $(SRC) ../include/nomiq_proto.h
-	$(CC) $(CFLAGS) -I../include $(SRC) -o $@
+test_%: test_%.c $(CORE) $(HDRS)
+	$(CC) $(CFLAGS) $(INC) $(CORE) $< -o $@
 
 clean:
-	rm -f test_nomiq_proto
+	rm -f $(TESTS)
