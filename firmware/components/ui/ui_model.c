@@ -1,6 +1,8 @@
 /* ui_model.c — see include/ui_model.h */
 #include "ui_model.h"
 
+#pragma GCC diagnostic ignored "-Wformat-truncation"   /* status line is a fixed-width display field */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -118,8 +120,10 @@ static bool handle_system(ui_model_t *m, const ui_event_t *e, acts_t *a)
             status(m, s);
         }
         return true;
-    case EV_PAIRED:
-        if (m->n_contacts < UI_MAX_CONTACTS) {
+    case EV_PAIRED: {
+        bool known = false;
+        for (uint8_t i = 0; i < m->n_contacts; i++) if (m->contacts[i].id == e->peer) known = true;
+        if (!known && m->n_contacts < UI_MAX_CONTACTS) {
             ui_contact_t *c = &m->contacts[m->n_contacts++];
             c->id = e->peer;
             snprintf(c->name, sizeof c->name, "Dev %04x", (unsigned)(e->peer & 0xFFFF));
@@ -127,6 +131,7 @@ static bool handle_system(ui_model_t *m, const ui_event_t *e, acts_t *a)
         status(m, "Paired");
         if (m->screen == SCR_PAIRING) go(m, SCR_HOME);
         return true;
+    }
     case EV_TICK: {
         if (m->screen == SCR_VOICE_REC && e->now_ms - m->rec_started_ms >= m->rec_max_ms) {
             stop_recording_to_preview(m, a, e->now_ms);
