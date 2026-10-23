@@ -68,7 +68,9 @@ flowchart TB
   APP <--> PWR[power\nfuel gauge, sleep, gating]
 ```
 
-* `nomiq_proto` is **pure C with no ESP-IDF dependency** so it is unit-tested on the host (`make -C firmware/components/nomiq_proto/test`).
+* `nomiq_proto` is **pure C with no ESP-IDF dependency** so it is unit-tested on the host.
+* `app_core` is the messenger service (pairing, encrypted link, queue, transfers, history) on top of `nomiq_proto` + `storage`. Its host test runs **three complete simulated devices** over a lossy shared channel: pairing with code comparison, encrypted text, long text, a photo at 20 % loss, sender power-cut + resume, replay/tamper rejection, unpaired-sender isolation, cancel, and history after reboot.
+* Run everything with `make test` at the repo root.
 * All inter-task communication goes through an event bus (FreeRTOS queues); no shared mutable state across tasks except the SPI bus lock.
 
 ## 5. Message lifecycle
