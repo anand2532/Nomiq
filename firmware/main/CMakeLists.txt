@@ -1,2 +1,2 @@
 idf_component_register(SRCS "main.c" INCLUDE_DIRS "."
-    REQUIRES nomiq_proto board radio_sx1262 audio camera storage ui power stt_link)
+    REQUIRES nomiq_proto board radio_sx1262 nvs_flash esp_timer)
