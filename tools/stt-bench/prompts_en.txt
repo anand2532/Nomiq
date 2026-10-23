@@ -1,0 +1,62 @@
+# 60 messenger-style prompts for the Phase 3 test set (read naturally, 3-10 s each).
+# Record each prompt through the Nomiq mic at 16 kHz mono, quiet and with 60 dB babble noise.
+I am at the north gate, come quickly
+Send me a photo of the map
+The battery is at twenty percent
+Meet me near the water tank at five
+Do you copy, over
+We need more water at the second camp
+The road is blocked after the bridge
+I will be late by thirty minutes
+Can you hear me clearly
+Check the signal on the hill
+Bring the first aid kit to the tent
+Ravi has reached the village
+The generator stopped working again
+Please call back when you are free
+We are moving towards the river
+How many people are with you
+The truck will leave at seven in the morning
+Wait for my message before you start
+Everything is fine here, no problems
+Take a picture of the damaged wall
+Turn left after the temple and go straight
+The weather looks bad, rain is coming
+I found the missing equipment
+Repeat your last message please
+Switch to channel three
+We have food for two more days
+The doctor will arrive tomorrow
+Keep the device charged overnight
+I can see smoke on the east side
+Send the coordinates again
+The pump needs a new belt
+School is closed today because of the flood
+Please confirm when you receive this
+We will camp here for the night
+The signal is weak inside the building
+Ask Priya to bring the spare antenna
+Count the boxes and tell me the number
+The gate code is four five one two
+Do not cross the stream after dark
+I am returning to base now
+The bus is full, take the next one
+Our team has finished the survey
+Tell everyone the meeting is cancelled
+Look for the red flag near the trees
+How far are you from the main road
+The patient is stable and resting
+Buy twenty litres of diesel
+The phone network is down again
+Lock the store room before leaving
+We saw three elephants near the field
+Message received, thank you
+The bridge is safe for small vehicles
+Send voice notes if typing is hard
+Charge the solar panel battery first
+I need help lifting the box
+Let us meet at the bus stand
+Please stay where you are
+The sample is ready for testing
+Good morning, the road is clear
+End of message
