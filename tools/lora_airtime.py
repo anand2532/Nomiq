@@ -18,9 +18,9 @@ import math
 # Protocol constants — keep in sync with firmware/components/nomiq_proto/include/nomiq_proto.h
 LORA_MAX_PAYLOAD = 255
 HEADER_BYTES = 20          # nomiq_hdr_t
-MIC_BYTES = 8              # truncated AES-CCM tag
-FRAG_PAYLOAD = LORA_MAX_PAYLOAD - HEADER_BYTES - MIC_BYTES  # 227
-ACK_FRAME_BYTES = HEADER_BYTES + MIC_BYTES + 10             # SACK: 64-bit bitmap + snr + rssi
+SEC_BYTES = 12             # frame counter (4) + AES-CCM tag (8)
+FRAG_PAYLOAD = LORA_MAX_PAYLOAD - HEADER_BYTES - SEC_BYTES  # 223
+ACK_FRAME_BYTES = HEADER_BYTES + SEC_BYTES + 10             # SACK: 64-bit bitmap + snr + rssi
 FRAGS_PER_WINDOW = 16      # sender sends a burst, then waits for a SACK
 TURNAROUND_S = 0.030       # TX->RX switch + processing guard per exchange
 
@@ -54,7 +54,7 @@ def transfer_time(nbytes: int, sf: int, bw_khz: float, cr: int = 1, per: float =
     n_frags = max(1, math.ceil(nbytes / FRAG_PAYLOAD))
     last = nbytes - (n_frags - 1) * FRAG_PAYLOAD
     t_full = time_on_air(LORA_MAX_PAYLOAD, sf, bw_khz, cr)
-    t_last = time_on_air(HEADER_BYTES + MIC_BYTES + last, sf, bw_khz, cr)
+    t_last = time_on_air(HEADER_BYTES + SEC_BYTES + last, sf, bw_khz, cr)
     t_ack = time_on_air(ACK_FRAME_BYTES, sf, bw_khz, cr)
     windows = math.ceil(n_frags / FRAGS_PER_WINDOW)
     tx_air = ((n_frags - 1) * t_full + t_last) / (1 - per)
@@ -84,7 +84,7 @@ def table() -> None:
             r = transfer_time(b, sf, bw, per=0.1)
             row.append(f"{r['wall_s']:>20.1f} s")
         print(f"SF{sf:<2}/{bw:<4} {time_on_air(255, sf, bw) * 1000:>6.0f}ms | " + " | ".join(row))
-    print("\n(assumes CR4/5, 8-sym preamble, 10% PER, no duty-cycle limit, 227 B payload/fragment)")
+    print("\n(assumes CR4/5, 8-sym preamble, 10% PER, no duty-cycle limit, 223 B payload/fragment)")
     print("With a 2.5% duty-cycle profile multiply TX airtime by 40 — see docs/specs/lora-link-budget.md")
 
 

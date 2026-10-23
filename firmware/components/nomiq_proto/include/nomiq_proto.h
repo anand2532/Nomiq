@@ -18,11 +18,13 @@ extern "C" {
 #define NOMIQ_PROTO_VERSION     1u
 #define NOMIQ_LORA_MAX_FRAME    255u
 #define NOMIQ_HDR_LEN           20u
-#define NOMIQ_MIC_LEN           8u
-#define NOMIQ_MAX_PAYLOAD       (NOMIQ_LORA_MAX_FRAME - NOMIQ_HDR_LEN - NOMIQ_MIC_LEN) /* 227 */
+#define NOMIQ_CTR_LEN           4u   /* per-sender frame counter (nonce + replay protection) */
+#define NOMIQ_MIC_LEN           8u   /* AES-128-CCM tag */
+#define NOMIQ_SEC_LEN           (NOMIQ_CTR_LEN + NOMIQ_MIC_LEN)
+#define NOMIQ_MAX_PAYLOAD       (NOMIQ_LORA_MAX_FRAME - NOMIQ_HDR_LEN - NOMIQ_SEC_LEN) /* 223 */
 #define NOMIQ_BROADCAST         0xFFFFFFFFu
 
-#define NOMIQ_MAX_FRAGS         512u   /* 512 * 227 B = 116 kB max object */
+#define NOMIQ_MAX_FRAGS         512u   /* 512 * 223 B = 114 kB max object */
 #define NOMIQ_WINDOW            16u
 #define NOMIQ_DEDUP_ENTRIES     64u
 
@@ -80,15 +82,20 @@ typedef enum {
 uint16_t nomiq_crc16(const uint8_t *data, size_t len, uint16_t crc);
 
 /*
- * Encode header + payload into buf (no MIC; crypto layer appends it).
- * Computes and stores hdr->crc16. Returns frame length or negative nomiq_err_t.
+ * Encode a plaintext frame: header + payload. Computes and stores hdr->crc16.
+ * (Encrypted frames are produced by nomiq_frame_seal() in nomiq_crypto.h.)
+ * Returns frame length or negative nomiq_err_t.
+ *
+ * CRC-16 always covers header bytes 0..17 and every byte after the header
+ * (payload, or counter+ciphertext+MIC for encrypted frames).
  */
 int nomiq_frame_encode(nomiq_hdr_t *hdr, const uint8_t *payload,
                        uint8_t *buf, size_t buf_len);
 
 /*
- * Decode a frame (header + payload, MIC already stripped/verified).
- * On success *payload points into buf. Returns NOMIQ_OK or negative error.
+ * Decode a frame and check its CRC. For plaintext frames *payload points at the payload.
+ * For frames with NOMIQ_F_ENCRYPTED, *payload points at counter+ciphertext+MIC and the
+ * caller must use nomiq_frame_open() instead. Returns NOMIQ_OK or negative error.
  */
 int nomiq_frame_decode(const uint8_t *buf, size_t len,
                        nomiq_hdr_t *hdr, const uint8_t **payload);
