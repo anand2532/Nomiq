@@ -1,1 +1,1 @@
-idf_component_register(INCLUDE_DIRS "include")
+idf_component_register(SRCS "board.c" INCLUDE_DIRS "include" REQUIRES driver esp_hw_support)
