@@ -9,5 +9,8 @@
 | MAX98357A | Datasheet (Analog Devices) |
 | BQ25895 / BQ24074 | Datasheets (TI) |
 | MAX17048 | Datasheet (Analog Devices) |
-| TPS63802 | Datasheet (TI) |
+| TPS63001 | Datasheet (TI SLVS520) — DRC package, fixed 3.3 V |
+| TPS22918, TLV755P | Datasheets (TI) |
+| PE4259 | Datasheet (pSemi) |
+| TG2016SMN | Datasheet (Epson) |
 | TCA9535 | Datasheet (TI) |
