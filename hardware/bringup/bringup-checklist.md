@@ -19,3 +19,17 @@
 | 15 | STT co-proc power on → READY over UART | Boot time logged | |
 | 16 | Charge 0.5 → 1 A, thermal | < 45 °C on charger | |
 | 17 | Sleep current (screen off, RX duty-cycled) | ≤ 3 mA | |
+
+## A0 board specifics (generated layout, see hardware/kicad/nomiq)
+
+| Item | Where / how |
+|---|---|
+| Test points | TP1 PGOOD_N, TP3 VBUS, TP4 VSYS, TP5 VBAT, TP6 V3V3, TP7 GND (bottom end, F side); TP8/TP9 I²C, TP10 EN, TP11 BUSY, TP12 DIO1 |
+| Debug | J3 Tag-Connect TC2030-NL (1 3V3, 2 EN, 3 TXD0, 4 RXD0, 5 IO0, 6 GND); SW1 RESET, SW2 BOOT on the F side |
+| Current-limit first power-up | 100 mA on VBUS; 3V3 must start with ≤ 60 mA (no display backlight until GPIO45 PWM) |
+| Charger setpoints | ICHG ≈ 1.0 A (R3 887 Ω), input limit ≈ 1.42 A (R4 1.13 kΩ), ITERM ≈ 99 mA (R5 2.94 kΩ), 5 h timer (R6 37.4 kΩ) |
+| 3V3 converter | TPS63001 fixed 3.3 V; check ripple < 50 mV p-p at 300 mA load, battery 3.0 V and 4.2 V |
+| RF tuning | fit C46/C48 (DNP) for the antenna π-match after VNA measurement at the u.FL; PA low-pass and balun values are reference-topology starting points |
+| Mic | bottom-port ICS-43434 hears through the PCB port hole and the front-face hole (MIC_X/MIC_Y) — fit the gasket |
+| Display | module soldered through J7 on a 2.5 mm spacer; check pin order against the purchased module before soldering |
+| Order of assembly | SMT both sides (JLC files in fab/), then J7 display module, then speaker, camera flex, battery |
