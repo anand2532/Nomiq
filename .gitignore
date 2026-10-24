@@ -27,3 +27,10 @@ mechanical/exports/*.step
 # OS
 .DS_Store
 firmware/**/test/*.a
+
+# PCB tooling
+hardware/design/router/_astar.so
+hardware/kicad/nomiq/fab/out/
+hardware/kicad/nomiq/*-backups/
+hardware/kicad/nomiq/nomiq.kicad_prl
+__pycache__/

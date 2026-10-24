@@ -1,8 +1,23 @@
 # Hardware
 
-KiCad 9/10 project in `kicad/nomiq/`. Open `nomiq.kicad_pro`.
+KiCad 8+ project in `kicad/nomiq/`. Open `nomiq.kicad_pro`. Everything in it is **generated** from
+Python sources in `design/` — edit those, regenerate, and let CI verify:
 
-**Capture from `design/out/connections.md`** — generated and checked by `design/nomiq_hw.py` (128 parts, 97 nets, consistency with the firmware pin map enforced in CI).
+| Step | Source | Command | Check (make tools / CI) |
+|---|---|---|---|
+| Netlist + pin map (138 parts, 99 nets) | `design/nomiq_hw.py` | `python3 hardware/design/nomiq_hw.py` | `--check` (firmware pin map, straps, supplies) |
+| Footprint library (36) | `design/fplib.py` | `python3 hardware/design/fplib.py` | `--check` (library up to date, courtyards) |
+| Schematic (8 sheets) | `design/gen_kicad.py` | `python3 hardware/design/gen_kicad.py` | `--check` (connectivity = spec, pad maps) |
+| PCB: placement + routing | `design/board.py`, `placement.py`, `gen_pcb.py` | `python3 hardware/design/gen_pcb.py` (~10 min) | `pcb_check.py` (clearance, edge, courtyards, connectivity) |
+| BOM / CPL / cost | `design/gen_bom.py` | `python3 hardware/design/gen_bom.py` | — |
+| Zone fill, KiCad DRC, Gerbers, drill, STEP | `kicad/tools/fab.py` | CI job `kicad` (kicad/kicad:8.0) | artifact `nomiq-a0-fab` |
+
+PCB: 64.6 × 124.6 mm, 4 layers (F signal / In1 GND / In2 3V3 / B signal), JLC04161H-7628, 0.127 mm rule,
+0.6/0.3 mm vias. **F side = electronics (faces the battery/back cover), B side = user interface (display
+module, keys, speaker connector).** Mechanical interface (outline, bosses, keys, display, USB, mic, camera,
+SMA) comes from `mechanical/enclosure/params.py`. Routing is produced by the project's grid router
+(A* in `design/router/astar.c`); the RF section (SX1262 → PA filter / balun → PE4259 → u.FL) is routed
+first on F.Cu without vias over the In1 ground plane and must be reviewed and tuned on a VNA.
 
 ## Schematic sheet plan (hierarchical)
 

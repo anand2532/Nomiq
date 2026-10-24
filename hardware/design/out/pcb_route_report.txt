@@ -1,0 +1,25 @@
+legalised 15 parts: C21 C20 R23 R25 TP9 C62 C41 D1 R7 R8 TP1 C8 TP3 TP6 TP7
+hand-drawn: 47 segments (RF, TCXO, DC-DC, amp straps)
+RF routed 1s
+fanout GND (coarse): 104 pads, 17 vias in EP
+fanout GND (coarse): 0 pads, 0 vias in EP
+fanout GND (fine): 30 pads, 0 vias in EP
+fanout V3V3 (coarse): 37 pads, 0 vias in EP
+fanout V3V3 (fine): 4 pads, 0 vias in EP
+first pass: 15 failed connections
+rip-up round 1: 7 failed
+rip-up round 2: 2 failed
+rip-up round 3: 1 failed
+rip-up round 4: 1 failed
+rip-up round 5: 1 failed
+rip-up round 6: 1 failed
+rip-up round 7: 2 failed
+rip-up round 8: 2 failed
+rip-up round 9: 2 failed
+rip-up round 10: 5 failed
+rip-up round 11: 2 failed
+rip-up round 12: 0 failed
+routing done 543s, 1563 segments, 498 vias, 0 failed
+widened 290 power/supply segments to net-class width
+FAILED:
+

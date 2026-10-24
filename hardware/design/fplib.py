@@ -247,7 +247,7 @@ add(Footprint("PinHeader_2x05_P1.27mm_Vertical_SMD",
 
 # 2.4" ILI9341 SPI module: 14 pins soldered through the board, module body on the front side.
 # Module outline and pin-1 position are parameters (mechanical/enclosure/params.py TFT_*) - verify on the purchased module.
-TFT_W, TFT_H, TFT_PIN1_X, TFT_PIN1_Y = 42.72, 60.0, -16.51, -27.5   # pin row along the module's top edge
+TFT_W, TFT_H, TFT_PIN1_X, TFT_PIN1_Y = 42.72, 60.0, -16.51, 27.5    # pin row along the module bottom edge
 _tft = [(str(i + 1), "thru_hole", "rect" if i == 0 else "circle", TFT_PIN1_X + i * 2.54, TFT_PIN1_Y, 0, 1.7, 1.7, "1", "th", 0)
         for i in range(14)]
 add(Footprint("TFT_2.4in_ILI9341_1x14", _tft, (-TFT_W / 2 - 0.25, -TFT_H / 2 - 0.25, TFT_W / 2 + 0.25, TFT_H / 2 + 0.25),
