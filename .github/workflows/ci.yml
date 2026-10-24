@@ -36,25 +36,31 @@ jobs:
             tail -n 40 enclosure.log | while IFS= read -r l; do echo "::error title=enclosure::$l"; done; exit 1; }
       - uses: actions/upload-artifact@v4
         with: {name: enclosure, path: mechanical/exports/}
-  kicad-erc:
+  kicad:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    continue-on-error: true   # non-blocking: informational ERC until placeholder pads are verified
+    timeout-minutes: 25
+    continue-on-error: true   # non-blocking until the first green KiCad DRC run
     container: kicad/kicad:8.0
     steps:
       - uses: actions/checkout@v4
       - name: ERC
         run: |
           cd hardware/kicad/nomiq
-          kicad-cli sch erc --format report --severity-error -o erc.rpt nomiq.kicad_sch || true
-          cat erc.rpt
-          kicad-cli sch export netlist -o nomiq.net nomiq.kicad_sch
-          grep -c "(net (code" nomiq.net
+          mkdir -p fab/out
+          kicad-cli sch erc --format report --severity-all --units mm -o fab/out/erc.rpt nomiq.kicad_sch || true
+          cat fab/out/erc.rpt | tail -40
+          kicad-cli sch export netlist -o fab/out/nomiq.net nomiq.kicad_sch
+          kicad-cli sch export pdf -o fab/out/nomiq-a0-schematic.pdf nomiq.kicad_sch || true
+      - name: Zone fill, DRC, Gerbers, drill, pos, STEP
+        run: python3 hardware/kicad/tools/fab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: kicad-erc
-          path: hardware/kicad/nomiq/erc.rpt
+          name: nomiq-a0-fab
+          path: |
+            hardware/kicad/nomiq/fab/out/
+            hardware/kicad/nomiq/fab/bom_jlc.csv
+            hardware/kicad/nomiq/fab/cpl_jlc.csv
   firmware-build:
     runs-on: ubuntu-latest
     timeout-minutes: 40
