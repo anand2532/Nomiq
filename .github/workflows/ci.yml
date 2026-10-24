@@ -6,6 +6,7 @@ on:
 jobs:
   host-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y libssl-dev
@@ -21,6 +22,7 @@ jobs:
       - run: python3 -m json.tool .mcp.json > /dev/null
   enclosure:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     continue-on-error: true   # non-blocking until first green run (not runnable in authoring sandbox)
     steps:
       - uses: actions/checkout@v4
@@ -36,16 +38,36 @@ jobs:
         with: {name: enclosure, path: mechanical/exports/}
   firmware-build:
     runs-on: ubuntu-latest
-    continue-on-error: true   # non-blocking until ESP-IDF build verified (Phase 1)
+    timeout-minutes: 40
+    continue-on-error: true   # non-blocking until the first green CI run (builds locally with IDF v5.3.2)
     container: espressif/idf:v5.3.2
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: devkit-linktest
+            extra: ""
+          - name: pcb-messenger
+            extra: "CONFIG_NOMIQ_APP_MESSENGER=y\nCONFIG_NOMIQ_BOARD_PCB_A0=y"
     steps:
       - uses: actions/checkout@v4
-      - name: idf.py build
+      - name: idf.py build (${{ matrix.config.name }})
         shell: bash
         run: |
           set -o pipefail
           . $IDF_PATH/export.sh
           cd firmware
-          (idf.py set-target esp32s3 && idf.py build) 2>&1 | tee build.log || {
-            grep -E "error|Error|ERROR|undefined reference" build.log | head -n 40 | while IFS= read -r l; do echo "::error title=firmware::$l"; done
+          printf "${{ matrix.config.extra }}\n" > sdkconfig.ci
+          (idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.ci" set-target esp32s3 && idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.ci" build) 2>&1 | tee build.log || {
+            grep -E "error|Error|ERROR|undefined reference" build.log | head -n 40 | while IFS= read -r l; do echo "::error title=firmware ${{ matrix.config.name }}::$l"; done
             exit 1; }
+          idf.py size | tail -n 20
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.config.name }}
+          path: |
+            firmware/build/nomiq.bin
+            firmware/build/nomiq.elf
+            firmware/build/bootloader/bootloader.bin
+            firmware/build/partition_table/partition-table.bin
+            firmware/build/flasher_args.json

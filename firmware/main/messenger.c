@@ -137,7 +137,7 @@ static void worker_task(void *arg)
             esp_err_t e = stt_power_on(15000);
             if (e == ESP_OK) e = stt_transcribe_file(REC_PCM, "en", &r);
             stt_power_off();
-            snprintf(s_stt_text, sizeof s_stt_text, "%s", r.text);
+            snprintf(s_stt_text, sizeof s_stt_text, "%.*s", UI_TEXT_MAX, r.text);
             ui_event_t u = { .type = e == ESP_OK ? EV_STT_FINAL : EV_STT_ERROR, .text = s_stt_text, .confidence = r.confidence };
             post_ui(u);
         } else if (j == JOB_CAPTURE) {
