@@ -26,4 +26,4 @@ Battery: 3000 mAh × 3.7 V ≈ 11.1 Wh, usable ≈ 85 % → **9.4 Wh**. Currents
 
 Comfortably meets ≥ 3 days; the dominant risk is **idle RX current** — must use SX1262 RX duty-cycle / CAD mode with a preamble long enough to wake (trade-off: longer preamble → more airtime per packet). Verify in Phase 1.
 
-Peak current: camera + TX + amp must not overlap (firmware interlock) → design 3V3 rail for ≥ 1.2 A, VSYS for ≥ 2 A peak (SoM boot spike).
+Peak current: camera + TX + amp must not overlap (firmware interlock). 3V3 rail (TPS63001): 0.8 A at 2.4 V battery, 1.2 A above 3.6 V — worst-case 3V3 load ≈ 0.45 A (ESP32 90 mA, SX1262 TX 120 mA, LCD 45 mA, camera 100 mA, SD 100 mA). VSYS ≥ 2 A peak (amp + SoM boot spike) comes straight from the BQ24074 power path (1.42 A input limit + battery). TPS63001 Iq 50 µA adds ≈ 1.2 mAh/day.

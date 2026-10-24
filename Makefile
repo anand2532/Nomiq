@@ -38,6 +38,7 @@ tools:
 	python3 hardware/design/nomiq_hw.py --check
 	python3 hardware/design/gen_kicad.py --check
 	python3 hardware/design/fplib.py --check
+	python3 hardware/design/pcb_check.py
 
 clean:
 	$(MAKE) -C firmware/components/nomiq_proto/test clean

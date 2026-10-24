@@ -45,6 +45,8 @@ Delegate to the owning agent; for cross-cutting work start with project-manager.
 - `make test` — all host tests (protocol, transfer simulation, crypto vectors, message store, tools)
 - `python3 mechanical/enclosure/enclosure.py --out mechanical/exports` — build enclosure
 - `cd firmware && idf.py set-target esp32s3 build` — firmware build (ESP-IDF ≥ 5.3)
+- `python3 hardware/design/gen_kicad.py` / `fplib.py` / `gen_pcb.py` / `gen_bom.py` — regenerate schematic, footprints, PCB, BOM
+- `python3 hardware/design/pcb_check.py` — independent DRC + connectivity check of the PCB file
 
 ## Git (via git-ops-bot / `tools/gitbot/gitflow.sh`)
 Never push to main directly. Flow: `gitflow.sh start "<title>" <area> <phase>` → `gitflow.sh commit "type(scope): msg"` → `gitflow.sh pr` → CI → `gitflow.sh merge`. `gh` must be logged in as anand2532.
