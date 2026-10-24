@@ -70,7 +70,7 @@ static void IRAM_ATTR dio1_isr(void *arg)
 static void radio_task(void *arg)
 {
     (void)arg;
-    uint8_t buf[256];
+    uint8_t buf[255];   /* SX1262 max payload; sx126x_read_packet takes a uint8_t length */
     for (;;) {
         xSemaphoreTake(s_irq_sem, pdMS_TO_TICKS(1000));
         xSemaphoreTake(s_lock, portMAX_DELAY);
