@@ -14,47 +14,42 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | C4 | 4.7uF/10V |  |  |
 | C5 | 1uF/10V |  |  |
 | C6 | 10uF/10V |  |  |
-| C7 | 22uF/6.3V |  |  |
+| C7 | 22uF/6.3V |  | TPS63001 COUT ≥ 15 uF |
 | C8 | 22uF/6.3V |  |  |
-| C9 | 1nF |  | slew-rate (inrush) control |
+| C9 | 1nF |  | slew-rate (inrush) control: SR ≈ 0.55 × 1000 + 30 = 580 us/V |
 | C10 | 1uF/10V |  |  |
 | C11 | 22uF/10V |  |  |
 | D1 | USBLC6-2SC6 | STMicro USBLC6-2SC6 |  |
 | D2 | SMF5.0A | Littelfuse SMF5.0A | VBUS TVS |
 | J1 | USB-C 16P | GCT USB4105-GF-A |  NC: SBU1, SBU2. |
 | J2 | Battery JST-PH 3P (+, NTC, -) | JST S3B-PH-SM4-TB | pack with protection PCM and 10k NTC; if the pack has no PCM fit U11 |
-| L1 | 0.47uH | Coilcraft XFL4015-471MEB |  ⚠️ verify |
+| L1 | 2.2uH | Taiyo Yuden NRS4018T2R2MDGJ | 2.2 uH, Isat > 2.2 A (TPS63001 table 1 class) |
 | R1 | 5.1k |  | UFP Rd |
 | R2 | 5.1k |  | UFP Rd |
-| R3 | 887R 1% |  | ICHG = 890/RISET ≈ 1.0 A ⚠️ verify |
-| R4 | 1.05k 1% |  | IIN_MAX = 1550/RILIM ≈ 1.48 A ⚠️ verify |
-| R5 | 5.36k 1% |  | ITERM ≈ 10 % of ICHG (check KITERM in datasheet) ⚠️ verify |
-| R6 | 46.4k 1% |  | safety timer ≈ 5 h fast-charge (check KTMR) ⚠️ verify |
+| R3 | 887R 1% |  | ICHG = KISET/RISET = 890/887 ≈ 1.0 A |
+| R4 | 1.13k 1% |  | IIN_MAX = KILIM/RILIM = 1610/1130 ≈ 1.42 A (RILIM 1.1k..8k) |
+| R5 | 2.94k 1% |  | ITERM = 0.03 × RITERM/RISET ≈ 99 mA (10 % of ICHG) |
+| R6 | 37.4k 1% |  | tMAXCHG = 10 × 48 s/kΩ × 37.4k ≈ 5.0 h; pre-charge 30 min |
 | R7 | 100k |  | open-drain pull-up -> IOX P06 |
 | R8 | 100k |  |  |
 | R9 | 100k |  |  |
-| R10 | 510k 1% |  | VOUT = 0.5 V × (1 + R10/R11) = 3.30 V ⚠️ verify |
-| R11 | 91k 1% |  |  ⚠️ verify |
-| R12 | 100k |  |  |
 | R13 | 100k |  | SoM off at reset |
 | TP1 | TP |  |  |
-| TP2 | TP |  |  |
 | TP3 | TP |  |  |
 | TP4 | TP |  |  |
 | TP5 | TP |  |  |
 | TP6 | TP |  |  |
 | TP7 | TP |  |  |
-| U8 | BQ24074 | TI BQ24074RGTR | 1S Li-ion linear charger with dynamic power-path; VSYS=OUT ⚠️ verify |
-| U9 | MAX17048 | Analog Devices MAX17048G+T10 | ModelGauge fuel gauge, I2C 0x36 ⚠️ verify |
-| U10 | TPS63802 | TI TPS63802DLAR | 2 A buck-boost, 3.3 V stays regulated from 2.5-4.4 V VSYS ⚠️ verify |
-| U14 | TPS22918 (STT rail) | TI TPS22918DBVR | 2 A load switch for STT SoM ⚠️ verify |
+| U8 | BQ24074 | TI BQ24074RGTR | 1S Li-ion linear charger with dynamic power-path; VSYS=OUT |
+| U9 | MAX17048 | Analog Devices MAX17048G+T10 | ModelGauge fuel gauge, I2C 0x36 |
+| U10 | TPS63001 | TI TPS63001DRCR | fixed 3.3 V buck-boost: 1.2 A (VIN > 3.6 V) / 0.8 A (VIN 2.4 V); 50 uA Iq; FB tied to VOUT |
+| U14 | TPS22918 (STT rail) | TI TPS22918DBVR | 2 A load switch for STT SoM |
 
 ### Nets
 
 | Net | Members | Also on sheets |
 |---|---|---|
 | `BAT_NTC` | U8.TS, J2.NTC |  |
-| `BB_FB` | U10.FB, R10.2, R11.1 |  |
 | `BB_L1` | L1.1, U10.L1 |  |
 | `BB_L2` | L1.2, U10.L2 |  |
 | `CHG_ILIM` | R4.1, U8.ILIM |  |
@@ -63,24 +58,23 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | `CHG_STAT_N` | U8.CHG, R7.1, U4.P06 | 02_mcu |
 | `CHG_TMR` | R6.1, U8.TMR |  |
 | `FG_ALRT_N` | U9.ALRT, R9.1, U4.P17 | 02_mcu |
-| GND | 106 pins (all sheets) | |
+| GND | 115 pins (all sheets) | |
 | `I2C_SCL` | U9.SCL, U4.SCL, R25.1, TP9.1, J6.SCL, U1.IO5 | 02_mcu, 05_camera |
 | `I2C_SDA` | U9.SDA, U4.SDA, R24.1, TP8.1, J6.SDA, U1.IO4 | 02_mcu, 05_camera |
 | `J1_CC1` | R1.1, J1.CC1 |  |
 | `J1_CC2` | R2.1, J1.CC2 |  |
 | `PGOOD_N` | U8.PGOOD, R8.1, TP1.1 |  |
-| `PWR_GOOD` | U10.PG, R12.1, TP2.1 |  |
 | `STT_CT` | C9.1, U14.CT |  |
 | `STT_EN` | U14.ON, R13.1, U4.P15 | 02_mcu |
 | `USB_DN` | J1.DN1, J1.DN2, D1.IO2 |  |
 | `USB_DN_MCU` | D1.IO3, R23.1 | 02_mcu |
 | `USB_DP` | J1.DP1, J1.DP2, D1.IO1 |  |
 | `USB_DP_MCU` | D1.IO4, R22.1 | 02_mcu |
-| `V3V3` | R7.2, R8.2, R9.2, U10.VOUT, R10.1, R12.2, C7.1, C8.1, TP6.1, U1.3V3, R20.2, C21.1, C22.1, R21.2, J3.1, U4.VCC, C23.1, R24.2, R25.2, U2.VDD_IN, U2.VBAT, U2.VBAT_IO, C32.1, C33.1, R30.2, U3.VDD, U5.VDD, C40.1, U15.VIN, J7.VCC, J7.LED_A, R62.2, C60.1, J8.VDD, R63.2, R64.2, R65.2, C61.1, C62.1, R70.2, R71.2, R72.2, R73.2, R74.2, R75.2 | 02_mcu, 03_radio, 04_audio, 05_camera, 06_display_storage, 07_ui |
+| `V3V3` | R7.2, R8.2, R9.2, U10.VOUT, U10.FB, C7.1, C8.1, TP6.1, U1.3V3, R20.2, C21.1, C22.1, R21.2, J3.1, U4.VCC, C23.1, R24.2, R25.2, U2.VDD_IN, U2.VBAT, U2.VBAT_IO, C32.1, C33.1, R30.2, U3.VDD, U5.VDD, C40.1, U15.VIN, J7.VCC, Q1.S, R66.2, R62.2, C60.1, J8.VDD, R63.2, R64.2, R65.2, C61.1, C62.1, R70.2, R71.2, R72.2, R73.2, R74.2, R75.2 | 02_mcu, 03_radio, 04_audio, 05_camera, 06_display_storage, 07_ui |
 | `VBAT` | U8.BAT, C4.1, J2.BAT+, U9.CELL, U9.VDD, C5.1, TP5.1 |  |
 | `VBUS` | J1.VBUS, D1.VBUS, D2.K, C1.1, U8.IN, C2.1, TP3.1 |  |
 | `VSTT` | U14.VOUT, U14.QOD, C11.1, J9.VSTT1, J9.VSTT2 | 08_stt |
-| `VSYS` | U8.OUT, U8.EN2, C3.1, U10.VIN, U10.EN, C6.1, U14.VIN, C10.1, TP4.1, U6.VDD, C41.1, C42.1 | 04_audio |
+| `VSYS` | U8.OUT, U8.EN2, C3.1, U10.VIN, U10.VINA, U10.EN, C6.1, U14.VIN, C10.1, TP4.1, U6.VDD, C41.1, C42.1 | 04_audio |
 
 ## 02_mcu
 
@@ -99,8 +93,8 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | R23 | 0R |  |  |
 | R24 | 2.2k |  |  |
 | R25 | 2.2k |  |  |
-| SW1 | RESET | Panasonic EVQ-P7A01P |  |
-| SW2 | BOOT | Panasonic EVQ-P7A01P |  |
+| SW1 | RESET | C&K PTS810 SJM 250 SMTR LFS |  |
+| SW2 | BOOT | C&K PTS810 SJM 250 SMTR LFS |  |
 | TP8 | TP |  |  |
 | TP9 | TP |  |  |
 | TP10 | TP |  |  |
@@ -141,7 +135,7 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | `I2S_DOUT` | U6.DIN, U1.IO3 | 04_audio |
 | `I2S_WS` | U5.WS, U6.LRCLK, U1.IO48 | 04_audio |
 | `IOX_INT_N` | SW2.1, R21.1, J3.5, U4.INT, U1.IO0 |  |
-| `LCD_BL` | Q1.G, R61.1, U1.IO45 | 06_display_storage |
+| `LCD_BL` | Q2.G, R61.1, U1.IO45 | 06_display_storage |
 | `LCD_CS` | J7.CS, R62.1, U1.IO21 | 06_display_storage |
 | `LCD_DC` | J7.DC, U1.IO14 | 06_display_storage |
 | `LCD_RST_N` | U4.P11, J7.RESET | 06_display_storage |
@@ -167,40 +161,55 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | C31 | 47nF |  |  ⚠️ verify |
 | C32 | 0.1uF |  |  |
 | C33 | 10uF/6.3V |  |  |
-| C34 | 10pF |  | DC-block/AC-couple per Semtech TCXO guidance ⚠️ verify |
+| C34 | 10pF |  | XTA load per Semtech TCXO guidance (tune) ⚠️ verify |
 | C35 | 0.1uF |  |  |
+| C36 | 4.7pF |  | PA match shunt ⚠️ verify |
+| C37 | 6.8pF |  | low-pass shunt 1 ⚠️ verify |
+| C38 | 3.3pF |  | low-pass shunt 2 ⚠️ verify |
+| C39 | 47pF |  | DC block (PE4259 RF1 must be DC-free) |
+| C43 | 47pF |  | DC block (PE4259 RF2) |
+| C44 | 2.7pF |  | balun series C ⚠️ verify |
+| C45 | 2.7pF |  | balun shunt C ⚠️ verify |
+| C46 | DNP |  | antenna pi-match shunt 1 (tuning, not fitted) |
+| C47 | 100pF |  | series DC block (PE4259 RFC) |
+| C48 | DNP |  | antenna pi-match shunt 2 (tuning, not fitted) |
 | D3 | ESD RF (low C) | Infineon ESD0P2RF-02LS | < 0.2 pF, antenna port ESD |
-| FL1 | PA match + harmonic filter (ref design) | see Semtech ref BOM | discrete L/C network between RFO and switch; values from ref design ⚠️ verify |
-| FL2 | RX balun / match (ref design) | see Semtech ref BOM |  ⚠️ verify |
-| FL3 | Antenna π-match (tuning) |  | 0R + 2 × DNP shunt pads for antenna tuning |
-| J4 | u.FL | Hirose U.FL-R-SMT-1(10) |  |
+| J4 | u.FL | Hirose U.FL-R-SMT-1(10) | pigtail to bulkhead SMA in the top end cap |
 | L2 | 15uH | Murata LQM21FN150M70L | DC-DC inductor (ref design) ⚠️ verify |
+| L3 | 47nH | Murata LQW15AN47NJ00 | PA supply choke VR_PA -> RFO ⚠️ verify |
+| L4 | 12nH | Murata LQW15AN12NJ00 | low-pass series 1 ⚠️ verify |
+| L5 | 12nH | Murata LQW15AN12NJ00 | low-pass series 2 ⚠️ verify |
+| L6 | 27nH | Murata LQW15AN27NJ00 | balun series L ⚠️ verify |
+| L7 | 27nH | Murata LQW15AN27NJ00 | balun shunt L ⚠️ verify |
 | R30 | 10k |  | NSS high while ESP32 boots |
 | R31 | 220R |  | series per ref design ⚠️ verify |
 | TP11 | TP |  |  |
 | TP12 | TP |  |  |
-| U2 | SX1262 | Semtech SX1262IMLTRT | RF matching, balun, PA filter and DC-DC values: copy from Semtech SX1262 868 MHz reference design NC: XTB. ⚠️ verify |
-| U3 | PE4259 | pSemi PE4259-63 | SPDT: RF1 = TX path, RF2 = RX path ⚠️ verify |
-| Y1 | TCXO 32 MHz 1.8 V ±2 ppm | Epson TG2016SMN 32.0000M-MCGNNM3 | footprint placeholder: use 2016 4-pad NC: NC. ⚠️ verify |
+| U2 | SX1262 | Semtech SX1262IMLTRT | matching / filter component VALUES follow the Semtech 868 MHz reference topology and must be tuned on the VNA NC: XTB. |
+| U3 | PE4259 | pSemi PE4259-63 | SPDT, single-pin mode (pin 6 = VDD): CTRL high -> RFC-RF1 (TX) |
+| Y1 | TCXO 32 MHz 1.8 V ±2 ppm | Epson TG2016SMN 32.0000M-ECGNNM3 | E = 1.8 V option (firmware sets DIO3 TCXO 1.8 V); clipped sine NC: NC. |
 
 ### Nets
 
 | Net | Members | Also on sheets |
 |---|---|---|
-| `RF_ANT` | U3.RFC, FL3.IN |  |
-| `RF_ANT_CONN` | FL3.OUT, J4.SIG, D3.K |  |
-| `RF_RX` | U3.RF2, FL2.IN |  |
+| `RF_ANT` | U3.RFC, C46.1, C47.1 |  |
+| `RF_ANT_CONN` | C47.2, C48.1, J4.SIG, D3.K |  |
+| `RF_RX` | U3.RF2, C43.1 |  |
 | `RF_SW_CTRL` | U2.DIO2, U3.CTRL |  |
-| `RF_TX` | U3.RF1, FL1.OUT |  |
+| `RF_TX` | U3.RF1, C39.2 |  |
+| `RX_IN` | C43.2, C44.1, L6.1 |  |
 | `SX_DCC_SW` | L2.1, U2.DCC_SW |  |
-| `SX_RFI_N` | FL2.OUT_N, U2.RFI_N |  |
-| `SX_RFI_P` | FL2.OUT_P, U2.RFI_P |  |
-| `SX_RFO` | U2.RFO, FL1.IN |  |
+| `SX_RFI_N` | L6.2, C45.1, U2.RFI_N |  |
+| `SX_RFI_P` | C44.2, L7.1, U2.RFI_P |  |
+| `SX_RFO` | L3.2, C36.1, L4.1, U2.RFO |  |
 | `SX_VREG` | L2.2, U2.VREG, C30.1 |  |
-| `SX_VR_PA` | C31.1, U2.VR_PA |  |
+| `SX_VR_PA` | C31.1, U2.VR_PA, L3.1 |  |
 | `SX_XTA` | R31.2, C34.1, U2.XTA |  |
 | `TCXO_OUT` | R31.1, Y1.OUT |  |
 | `TCXO_VCC` | U2.DIO3, Y1.VCC, C35.1 |  |
+| `TX_N1` | L4.2, C37.1, L5.1 |  |
+| `TX_N2` | L5.2, C38.1, C39.1 |  |
 
 ## 04_audio
 
@@ -213,10 +222,10 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | C42 | 0.1uF |  |  |
 | J5 | Speaker JST-SH 2P | JST SM02B-SRSS-TB |  |
 | R40 | 100k |  | keeps GPIO46 strap low when mic is tri-stated |
-| R41 | 100k |  | GAIN_SLOT 100k to GND = 12 dB ⚠️ verify |
-| R43 | 100k |  | amp in shutdown while the expander is high-Z at reset; expander drives 3.3 V = on, left slot (firmware plays mono on L) ⚠️ verify |
-| U5 | ICS-43434 | TDK InvenSense ICS-43434 | bottom-port; LR=GND -> left slot ⚠️ verify |
-| U6 | MAX98357A | Analog Devices MAX98357AETE+T |  ⚠️ verify |
+| R41 | 100k |  | GAIN_SLOT 100k to GND = 15 dB (datasheet table) |
+| R43 | 100k |  | amp in shutdown while the expander is high-Z at reset; expander drives 3.3 V (> B2 1.4 V) = on, left channel |
+| U5 | ICS-43434 | TDK InvenSense ICS-43434 | bottom-port (PCB port hole); LR=GND -> left slot |
+| U6 | MAX98357A | Analog Devices MAX98357AETE+T |  NC: NC1, NC2, NC3, NC4. |
 
 ### Nets
 
@@ -236,7 +245,7 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | C51 | 1uF |  |  |
 | C52 | 1uF |  |  |
 | C53 | 1uF |  |  |
-| J6 | OV2640 24P FPC 0.5 mm | Hirose FH12-24S-0.5SH(55) | common 24-pin OV2640 module pinout — confirm against the purchased module NC: NC1, NC2, NC3. ⚠️ verify |
+| J6 | OV2640 24P FPC 0.5 mm | Hirose FH12-24S-0.5SH(55) | ESP32-CAM style 24-pin OV2640 flex (1 NC, 2 AGND ... 23 Y1, 24 Y0); check contact side vs the flex NC: NC1, NC2, NC3. ⚠️ verify |
 | R50 | 100k |  |  |
 | R51 | 33R |  | series termination at the MCU |
 | U12 | TLV75528 (2.8 V) | TI TLV75528PDBVR |  NC: NC. |
@@ -262,22 +271,25 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | C60 | 10uF/6.3V |  |  |
 | C61 | 10uF/6.3V |  |  |
 | C62 | 0.1uF |  |  |
-| J7 | TFT 2.4in ILI9341 SPI FPC | module-specific | pinout depends on the chosen panel; keep the net names NC: SDO. ⚠️ verify |
-| J8 | microSD push-push | Molex 104031-0811 |  NC: DAT1, DAT2. ⚠️ verify |
-| Q1 | AO3400A | AOS AO3400A | low-side backlight switch |
-| R60 | 10R |  | LED current limit — set for panel (check LED Vf/If) ⚠️ verify |
+| J7 | TFT 2.4in ILI9341 SPI module (14-pin) | 2.4in 240x320 ILI9341 SPI module, 1x14 2.54 mm | module pins soldered through the board; pin order of the common 2.4in SPI module (touch unused) NC: SDO, T_CLK, T_CS, T_DIN, T_DO, T_IRQ. ⚠️ verify |
+| J8 | microSD push-push | Molex 104031-0811 | card-detect switch between pads 9/10 (firmware treats either polarity) NC: DAT1, DAT2. |
+| Q1 | AO3401A | AOS AO3401A | high-side P-FET backlight switch, PWM from GPIO45 |
+| Q2 | 2N7002 | Nexperia 2N7002,215 |  |
+| R60 | 4.7R |  | extra series resistance; module has its own LED resistor/transistor ⚠️ verify |
 | R61 | 100k |  | GPIO45 strap must be LOW at reset |
 | R62 | 10k |  |  |
 | R63 | 10k |  |  |
 | R64 | 47k |  |  |
 | R65 | 47k |  |  |
+| R66 | 10k |  | P-FET gate pull-up: backlight off unless Q2 on |
 
 ### Nets
 
 | Net | Members | Also on sheets |
 |---|---|---|
-| `LCD_LED_K` | J7.LED_K, R60.1 |  |
-| `LCD_LED_K_SW` | Q1.D, R60.2 |  |
+| `LCD_BL_G` | Q2.D, Q1.G, R66.1 |  |
+| `LCD_LED` | R60.2, J7.LED |  |
+| `LCD_LED_SW` | Q1.D, R60.1 |  |
 
 ## 07_ui
 
@@ -297,12 +309,12 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 | R73 | 47k |  |  |
 | R74 | 47k |  |  |
 | R75 | 47k |  |  |
-| SW3 | button (front) | C&K PTS526 |  |
-| SW4 | button (front) | C&K PTS526 |  |
-| SW5 | button (front) | C&K PTS526 |  |
-| SW6 | button (front) | C&K PTS526 |  |
-| SW7 | button (left side) | Panasonic EVQ-P7A01P |  |
-| SW8 | button (right side) | Panasonic EVQ-P7A01P |  |
+| SW3 | button (front) | C&K PTS810 SJM 250 SMTR LFS |  |
+| SW4 | button (front) | C&K PTS810 SJM 250 SMTR LFS |  |
+| SW5 | button (front) | C&K PTS810 SJM 250 SMTR LFS |  |
+| SW6 | button (front) | C&K PTS810 SJM 250 SMTR LFS |  |
+| SW7 | button (left side) | Panasonic EVQ-P7A01P | right-angle, actuator over the board edge |
+| SW8 | button (right side) | Panasonic EVQ-P7A01P | right-angle, actuator over the board edge |
 | SW9 | POWER (ship-mode / wake) | Panasonic EVQ-P7A01P | to charger/PMIC power-on; v A0: wakes ESP32 via EN pulse — revisit with power-systems-engineer |
 
 ### Nets
@@ -325,32 +337,21 @@ Capture the schematic from this; do not edit by hand. Net names are normative.
 
 ## Values to verify against datasheets
 
-- **U8** BQ24074 (TI BQ24074RGTR) — 1S Li-ion linear charger with dynamic power-path; VSYS=OUT
-- **R3** 887R 1% () — ICHG = 890/RISET ≈ 1.0 A
-- **R4** 1.05k 1% () — IIN_MAX = 1550/RILIM ≈ 1.48 A
-- **R5** 5.36k 1% () — ITERM ≈ 10 % of ICHG (check KITERM in datasheet)
-- **R6** 46.4k 1% () — safety timer ≈ 5 h fast-charge (check KTMR)
-- **U9** MAX17048 (Analog Devices MAX17048G+T10) — ModelGauge fuel gauge, I2C 0x36
-- **U10** TPS63802 (TI TPS63802DLAR) — 2 A buck-boost, 3.3 V stays regulated from 2.5-4.4 V VSYS
-- **L1** 0.47uH (Coilcraft XFL4015-471MEB) — 
-- **R10** 510k 1% () — VOUT = 0.5 V × (1 + R10/R11) = 3.30 V
-- **R11** 91k 1% () — 
-- **U14** TPS22918 (STT rail) (TI TPS22918DBVR) — 2 A load switch for STT SoM
-- **U2** SX1262 (Semtech SX1262IMLTRT) — RF matching, balun, PA filter and DC-DC values: copy from Semtech SX1262 868 MHz reference design
 - **L2** 15uH (Murata LQM21FN150M70L) — DC-DC inductor (ref design)
 - **C30** 470nF () — 
 - **C31** 47nF () — 
-- **Y1** TCXO 32 MHz 1.8 V ±2 ppm (Epson TG2016SMN 32.0000M-MCGNNM3) — footprint placeholder: use 2016 4-pad
 - **R31** 220R () — series per ref design
-- **C34** 10pF () — DC-block/AC-couple per Semtech TCXO guidance
-- **U3** PE4259 (pSemi PE4259-63) — SPDT: RF1 = TX path, RF2 = RX path
-- **FL1** PA match + harmonic filter (ref design) (see Semtech ref BOM) — discrete L/C network between RFO and switch; values from ref design
-- **FL2** RX balun / match (ref design) (see Semtech ref BOM) — 
-- **U5** ICS-43434 (TDK InvenSense ICS-43434) — bottom-port; LR=GND -> left slot
-- **U6** MAX98357A (Analog Devices MAX98357AETE+T) — 
-- **R41** 100k () — GAIN_SLOT 100k to GND = 12 dB
-- **R43** 100k () — amp in shutdown while the expander is high-Z at reset; expander drives 3.3 V = on, left slot (firmware plays mono on L)
-- **J6** OV2640 24P FPC 0.5 mm (Hirose FH12-24S-0.5SH(55)) — common 24-pin OV2640 module pinout — confirm against the purchased module
-- **J7** TFT 2.4in ILI9341 SPI FPC (module-specific) — pinout depends on the chosen panel; keep the net names
-- **R60** 10R () — LED current limit — set for panel (check LED Vf/If)
-- **J8** microSD push-push (Molex 104031-0811) — 
+- **C34** 10pF () — XTA load per Semtech TCXO guidance (tune)
+- **L3** 47nH (Murata LQW15AN47NJ00) — PA supply choke VR_PA -> RFO
+- **C36** 4.7pF () — PA match shunt
+- **L4** 12nH (Murata LQW15AN12NJ00) — low-pass series 1
+- **C37** 6.8pF () — low-pass shunt 1
+- **L5** 12nH (Murata LQW15AN12NJ00) — low-pass series 2
+- **C38** 3.3pF () — low-pass shunt 2
+- **C44** 2.7pF () — balun series C
+- **L6** 27nH (Murata LQW15AN27NJ00) — balun series L
+- **L7** 27nH (Murata LQW15AN27NJ00) — balun shunt L
+- **C45** 2.7pF () — balun shunt C
+- **J6** OV2640 24P FPC 0.5 mm (Hirose FH12-24S-0.5SH(55)) — ESP32-CAM style 24-pin OV2640 flex (1 NC, 2 AGND ... 23 Y1, 24 Y0); check contact side vs the flex
+- **J7** TFT 2.4in ILI9341 SPI module (14-pin) (2.4in 240x320 ILI9341 SPI module, 1x14 2.54 mm) — module pins soldered through the board; pin order of the common 2.4in SPI module (touch unused)
+- **R60** 4.7R () — extra series resistance; module has its own LED resistor/transistor

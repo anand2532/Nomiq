@@ -37,6 +37,7 @@ tools:
 	python3 -m json.tool .mcp.json > /dev/null
 	python3 hardware/design/nomiq_hw.py --check
 	python3 hardware/design/gen_kicad.py --check
+	python3 hardware/design/fplib.py --check
 
 clean:
 	$(MAKE) -C firmware/components/nomiq_proto/test clean

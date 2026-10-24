@@ -73,13 +73,13 @@ Power button goes to the charger/PMIC "ship mode / power-on" input and a sense l
 
 ```
 USB-C (5 V, CC 5.1 k pulldowns, TVS)
-  └─ Charger w/ power-path (e.g. BQ25895 / BQ24074 class, 1 A)
+  └─ Charger w/ power-path BQ24074 (1.0 A charge, 1.42 A input limit, 5 h timer)
         ├─ BAT: 1S Li-ion 3000 mAh, protection IC (DW01+FS8205 or in-pack PCM), NTC
         └─ VSYS 3.4–4.4 V
-              ├─ 3V3 buck-boost (TPS63020/TPS63802 class, ≥ 2 A peak) → ESP32, LoRa, LCD, SD, mic, IOX
+              ├─ 3V3 buck-boost TPS63001 (fixed 3.3 V; 1.2 A buck / 0.8 A boost at 2.4 V) → ESP32, LoRa, LCD, SD, mic, IOX
               ├─ AMP supply directly from VSYS (class-D, efficiency)
-              ├─ CAM rails: 2.8 V AVDD/DOVDD-3V3, 1.2 V DVDD LDOs behind CAM_PWR_EN
-              └─ STT co-proc: 5 V boost or VSYS load switch behind STT_EN (depends on SoM)
+              ├─ CAM rails: TPS22918 switch (CAM_PWR_EN) → TLV75528 2.8 V AVDD, TLV75512 1.2 V DVDD, DOVDD 3V3
+              └─ STT co-proc: VSYS load switch TPS22918 behind STT_EN (5 V boost only if the SoM needs it)
 Fuel gauge (MAX17048 class) on BAT
 ```
 

@@ -1,19 +1,19 @@
 ref_block,function,candidate_mpn,alt_mpn,package,qty,status,notes
 U1,Main MCU module,ESP32-S3-WROOM-1-N16R8,ESP32-S3-WROOM-1U-N16R8,Module,1,selected,ADR-0001; U variant if external Wi-Fi antenna ever needed
 U2,LoRa transceiver,SX1262IMLTRT,Ebyte E22-900M22S (module),QFN-24,1,selected,TCXO 32 MHz 1.8 V on DIO3; Semtech 868 ref design matching
-Y1,TCXO,TCXO 32 MHz 1.8 V ±2 ppm (e.g. TG2016SMN class),-,2016,1,candidate,
-U3,RF switch,PE4259 / SKY13373,-,SC-70,1,candidate,"DIO2-controlled; only if HP+LP paths, else ref design single-path"
+Y1,TCXO,TG2016SMN 32.0000M-ECGNNM3 (1.8 V),-,2016,1,selected,"pin 1 NC, 2 GND, 3 OUT, 4 VCC; firmware sets DIO3 = 1.8 V"
+U3,RF switch,PE4259-63,SKY13373,SC-70-6,1,selected,"DIO2 = CTRL (high = RF1/TX), pin 6 = VDD single-pin mode; DC blocks on RF1/RF2/RFC"
 J1,Antenna connector,u.FL (U.FL-R-SMT-1),SMA edge,SMD,1,candidate,u.FL to bulkhead SMA pigtail
 U4,I/O expander,TCA9535PWR,PCA9535,TSSOP-24,1,candidate,I2C 0x20
 U5,MEMS microphone,ICS-43434,SPH0645LM4H,LGA,1,candidate,I2S; bottom-port -> acoustic gasket
 U6,Class-D amp,MAX98357AETE+,NAU8315,TQFN-16,1,candidate,"I2S in, 3.2 W @ 4 Ω; VSYS powered"
 LS1,Speaker,28 mm 8 Ω 1 W,20x30 mm 1 W,-,1,candidate,sealed back volume in enclosure
 U7,Camera,OV2640 24-pin FPC module,OV3660,FPC,1,candidate,"needs 2.8 V/1.2 V rails, PWDN/RESET via expander"
-DS1,Display,2.4in ILI9341 320x240 SPI,2.8in ST7789,FPC,1,open,decide with mechanical (window size)
+DS1,Display,2.4in ILI9341 240x320 SPI module (14-pin 2.54 mm),2.8in ST7789,module,1,selected,"soldered through J7, high-side P-FET backlight switch"
 J2,microSD,Molex 104031-0811 push-push,Hirose DM3AT,SMD,1,candidate,card detect -> expander
-U8,Charger + power path,BQ25895RTWR,BQ24074RGTR,WQFN-24,1,open,"1 A charge, I2C status, OTG not required"
+U8,Charger + power path,BQ24074RGTR,BQ25895RTWR,VQFN-16,1,selected,"RISET 887R, RILIM 1.13k, RITERM 2.94k, RTMR 37.4k"
 U9,Fuel gauge,MAX17048G+T10,BQ27441,DFN-8,1,candidate,I2C
-U10,3V3 buck-boost,TPS63802DLAR,TPS63020,VSON-10,1,candidate,"2 A, stays regulated at 3.0 V battery"
+U10,3V3 buck-boost,TPS63001DRCR,TPS63802DLAR,VSON-10 (DRC),1,selected,"fixed 3.3 V, 1.2 A/0.8 A; KiCad land pattern available (TPS63802 land pattern not published in usable form)"
 U11,Battery protection,DW01A + FS8205A,BQ29700,SOT-23-6,1,candidate,if pack has no PCM
 U12,Camera LDOs,TLV75528 + TLV75512,-,SOT-23-5,2,candidate,2.8 V + 1.2 V
 U13,STT co-processor,TBD (Phase 3),RV1106-class SoM / Pi Zero 2 W-class,module,1,blocked,ADR-0002

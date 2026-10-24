@@ -8,8 +8,8 @@ Design style: every pin ends in a short wire stub with a *global label* carrying
 name, so connectivity is explicit and identical to nomiq_hw.py (verified after writing by
 re-parsing the files and rebuilding the netlist). One hierarchical sheet per design sheet.
 Symbols are generated into the project library `nomiq` with datasheet pin names; pad
-numbers are real for U1 (ESP32-S3-WROOM-1) and U2 (SX1262) and sequential placeholders
-elsewhere (field "PadMap" = "unverified") — fix them when assigning final footprints.
+numbers come from the datasheet pad maps in nomiq_hw.py and are checked against the project
+footprint library (fplib.py): every mapped pad must exist and every copper pad must be mapped.
 
 Open nomiq.kicad_pro in KiCad 8/9, run ERC (`/hw-check`), then "Update PCB from schematic".
 """
@@ -37,35 +37,37 @@ def uid(*parts) -> str:
 
 
 # --------------------------------------------------------------------------- pad maps
-ESP32_S3_WROOM_1 = {
-    "GND": ["1", "40", "41"], "3V3": ["2"], "EN": ["3"], "IO4": ["4"], "IO5": ["5"], "IO6": ["6"], "IO7": ["7"],
-    "IO15": ["8"], "IO16": ["9"], "IO17": ["10"], "IO18": ["11"], "IO8": ["12"], "IO19": ["13"], "IO20": ["14"],
-    "IO3": ["15"], "IO46": ["16"], "IO9": ["17"], "IO10": ["18"], "IO11": ["19"], "IO12": ["20"], "IO13": ["21"],
-    "IO14": ["22"], "IO21": ["23"], "IO47": ["24"], "IO48": ["25"], "IO45": ["26"], "IO0": ["27"], "IO35": ["28"],
-    "IO36": ["29"], "IO37": ["30"], "IO38": ["31"], "IO39": ["32"], "IO40": ["33"], "IO41": ["34"], "IO42": ["35"],
-    "RXD0": ["36"], "TXD0": ["37"], "IO2": ["38"], "IO1": ["39"],
-}
-SX1262_QFN24 = {
-    "VDD_IN": ["1"], "GND": ["2", "5", "8", "20"], "XTA": ["3"], "XTB": ["4"], "DIO3": ["6"], "VREG": ["7"],
-    "DCC_SW": ["9"], "VBAT": ["10"], "VBAT_IO": ["11"], "DIO2": ["12"], "DIO1": ["13"], "BUSY": ["14"],
-    "NRESET": ["15"], "MISO": ["16"], "MOSI": ["17"], "SCK": ["18"], "NSS": ["19"], "RFI_P": ["21"],
-    "RFI_N": ["22"], "RFO": ["23"], "VR_PA": ["24"], "EP": ["25"],
-}
-PADMAPS = {"U1": ESP32_S3_WROOM_1, "U2": SX1262_QFN24}
+import fplib  # noqa: E402
+
+
+def footprint_ref(p: HW.Part) -> str:
+    return "nomiq:" + fplib.lib_name(p.footprint) if p.footprint else ""
 
 
 def pads_for(p: HW.Part) -> tuple[list[tuple[str, str]], bool]:
-    """[(pin_name, pad_number)], verified?"""
-    if p.ref in PADMAPS:
-        pm = PADMAPS[p.ref]
-        out = []
-        for name in p.pins:
-            for pad in pm[name]:
-                out.append((name, pad))
-        return out, True
-    if p.pins == ["1", "2"] or p.pins == ["1"] or all(x.isdigit() for x in p.pins):
-        return [(n, n) for n in p.pins], True
-    return [(n, str(i + 1)) for i, n in enumerate(p.pins)], False
+    """[(pin_name, pad_number)] from the datasheet pad map in nomiq_hw.py; verified = every pad exists in the footprint."""
+    out = [(name, pad) for name in p.pins for pad in p.pads[name]]
+    fp = fplib.FP.get(fplib.lib_name(p.footprint)) if p.footprint else None
+    ok = fp is not None and {pad for _, pad in out} <= {x[0] for x in fp.numbered()}
+    return out, ok
+
+
+def footprint_errors() -> list[str]:
+    """Every part has a library footprint, every mapped pad exists, every copper pad of the footprint is mapped."""
+    errs = []
+    for p in HW.PARTS.values():
+        if not p.footprint:
+            errs.append(f"{p.ref}: no footprint"); continue
+        fp = fplib.FP.get(fplib.lib_name(p.footprint))
+        if fp is None:
+            errs.append(f"{p.ref}: footprint {p.footprint} not in fplib"); continue
+        have = {x[0] for x in fp.numbered()}
+        mapped = {pad for n in p.pins for pad in p.pads[n]}
+        for pad in sorted(mapped - have):
+            errs.append(f"{p.ref}: pad {pad} not in {fp.name}")
+        for pad in sorted(have - mapped):
+            errs.append(f"{p.ref}: footprint pad {pad} of {fp.name} not mapped to a pin")
+    return errs
 
 
 # --------------------------------------------------------------------------- s-expr helpers
@@ -121,7 +123,7 @@ class Sym:
         s = [f'(symbol {q(name)} (pin_names (offset 0.508)) (exclude_from_sim no) (in_bom yes) (on_board yes)']
         s.append(prop("Reference", re.sub(r"\d+$", "", p.ref) or "U", 0, self.h / 2 + 2.54))
         s.append(prop("Value", p.value, 0, -self.h / 2 - 2.54))
-        s.append(prop("Footprint", p.footprint, 0, 0, hide=True))
+        s.append(prop("Footprint", footprint_ref(p), 0, 0, hide=True))
         s.append(prop("Datasheet", "", 0, 0, hide=True))
         s.append(prop("Description", p.note, 0, 0, hide=True))
         s.append(f'(symbol {q(name + "_0_1")} (rectangle (start {-self.w/2:.2f} {self.h/2:.2f}) (end {self.w/2:.2f} {-self.h/2:.2f}) '
@@ -183,14 +185,14 @@ def build_sheet(sheet: str, root_uuid: str, sheet_uuid: str, page: int) -> str:
         su = uid(sheet, p.ref)
         fields = [prop("Reference", p.ref, cx, cy - s.h / 2 - 2.54),
                   prop("Value", p.value, cx, cy + s.h / 2 + 2.54),
-                  prop("Footprint", p.footprint, cx, cy, hide=True),
+                  prop("Footprint", footprint_ref(p), cx, cy, hide=True),
                   prop("Datasheet", "", cx, cy, hide=True),
                   prop("MPN", p.mpn, cx, cy, hide=True),
                   prop("Verify", "yes" if p.verify else "", cx, cy, hide=True),
                   prop("PadMap", "datasheet" if s.verified else "unverified", cx, cy, hide=True)]
         pins = " ".join(f'(pin {q(pad)} (uuid {q(uid(sheet, p.ref, "pin", pad))}))' for _, pad, *_ in s.pins)
         out.append(f'(symbol (lib_id {q("nomiq:" + s.lib_name)}) (at {cx:.2f} {cy:.2f} 0) (unit 1) (exclude_from_sim no) '
-                   f'(in_bom yes) (on_board yes) (dnp no) (uuid {q(su)}) ' + " ".join(fields) + " " + pins +
+                   f'(in_bom yes) (on_board yes) (dnp {"yes" if p.dnp else "no"}) (uuid {q(su)}) ' + " ".join(fields) + " " + pins +
                    f' (instances (project "nomiq" (path {q("/" + root_uuid + "/" + sheet_uuid)} (reference {q(p.ref)}) (unit 1)))))')
         # stubs + labels / no-connects
         for nm, pad, lx, ly, ang in s.pins:
@@ -319,9 +321,10 @@ def main() -> int:
     for name, text in files.items():
         parse(text)   # syntax: balanced, tokenizable
     errs = verify(files)
+    errs += footprint_errors()
     unverified = sorted(r for r, s in SYMS.items() if not s.verified)
     print(f"{len(SYMS)} symbols, {len(files) - 2} sheets, connectivity {'OK' if not errs else 'MISMATCH'}; "
-          f"{len(unverified)} parts with placeholder pad numbers")
+          f"{len(unverified)} parts with unverified pad maps")
     for e in errs[:20]:
         print("ERROR:", e)
     if a.check:
