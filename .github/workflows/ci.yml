@@ -36,6 +36,25 @@ jobs:
             tail -n 40 enclosure.log | while IFS= read -r l; do echo "::error title=enclosure::$l"; done; exit 1; }
       - uses: actions/upload-artifact@v4
         with: {name: enclosure, path: mechanical/exports/}
+  kicad-erc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true   # non-blocking: informational ERC until placeholder pads are verified
+    container: kicad/kicad:8.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: ERC
+        run: |
+          cd hardware/kicad/nomiq
+          kicad-cli sch erc --format report --severity-error -o erc.rpt nomiq.kicad_sch || true
+          cat erc.rpt
+          kicad-cli sch export netlist -o nomiq.net nomiq.kicad_sch
+          grep -c "(net (code" nomiq.net
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kicad-erc
+          path: hardware/kicad/nomiq/erc.rpt
   firmware-build:
     runs-on: ubuntu-latest
     timeout-minutes: 40
