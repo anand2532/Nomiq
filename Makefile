@@ -36,6 +36,7 @@ tools:
 	bash -n tools/gitbot/gitflow.sh tools/gitbot/publish_queue.sh
 	python3 -m json.tool .mcp.json > /dev/null
 	python3 hardware/design/nomiq_hw.py --check
+	python3 hardware/design/gen_kicad.py --check
 
 clean:
 	$(MAKE) -C firmware/components/nomiq_proto/test clean
